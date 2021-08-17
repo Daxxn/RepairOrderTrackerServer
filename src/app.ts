@@ -3,15 +3,19 @@ import logger from 'morgan';
 import path from 'path';
 import cors, { CorsOptions } from 'cors';
 import dotEnv from 'dotenv';
-// import jwt from 'express-jwt';
-// import jwks from 'jwks-rsa';
 import http from 'http';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import createApiRouter from './routes/api';
 import createAuthRoute from './routes/auth';
+import authCheck from './authCheck';
+import AuthConfigHelper from './authCheck';
 
 dotEnv.config();
+
+//#region Get Environment Variables
+const auth = AuthConfigHelper.buildAuthSecrets();
+//#endregion
 
 const app = express();
 
@@ -20,41 +24,6 @@ const port = process.env.PORT || 2001;
 
 app.set('views', './public/static/');
 app.set('view engine', 'pug');
-
-//#region Get Environment Variables
-type AuthConfig = {
-  audience: string;
-  issuer: string;
-  algorythm: string;
-  dbConnection: string;
-  sessionSecret: string;
-  appOrigin: string;
-  localAppOrigin: string;
-  localAppPort: string;
-};
-
-const buildAuthSecrets = (): AuthConfig => {
-  if (process.env.AUTH0_AUDIENCE && process.env.AUTH0_ISSUER) {
-    if (process.env.APP_ORIGIN || process.env.LOCAL_APP_ORIGIN) {
-      return {
-        audience: process.env.AUTH0_AUDIENCE,
-        issuer: process.env.AUTH0_ISSUER,
-        algorythm: process.env.AUTH0_AGORYTHM,
-        dbConnection: process.env.DB_CONNECT,
-        sessionSecret: process.env.SESSION_SECRET,
-        appOrigin: process.env.APP_ORIGIN,
-        localAppOrigin: process.env.LOCAL_APP_ORIGIN,
-        localAppPort: process.env.LOCAL_APP_PORT
-      };
-    }
-    throw new Error(
-      'Cannot find app origin. An origin needs to be specified. Check ENV file.'
-    );
-  }
-  throw new Error('Cannot authorize. Check ENV file.');
-};
-const auth = buildAuthSecrets();
-//#endregion
 
 //#region Build Routes
 const buildLogoutRoute = () => {
@@ -123,23 +92,8 @@ app.use(session(sess));
 //#endregion
 
 //#region Setup Auth0 Middleware
-// const jwtCheck = jwt({
-//   secret: jwks.expressJwtSecret({
-//     cache: true,
-//     rateLimit: true,
-//     jwksRequestsPerMinute: 5,
-//     jwksUri: 'https://dev-6ryc0ksm.us.auth0.com/.well-known/jwks.json'
-//   }),
-//   audience: auth.audience,
-//   issuer: auth.issuer,
-//   algorithms: [auth.algorythm]
-// });
 
-// app.use(jwtCheck);
-
-// app.get('/authorized', (req: Request, res: Response) => {
-//   res.send('Secured Resource');
-// });
+app.use('/api', auth.authCheck);
 //#endregion
 
 app.get('/', (req: Request, res: Response) => {

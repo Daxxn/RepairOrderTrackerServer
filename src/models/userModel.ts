@@ -14,6 +14,7 @@ const userSchema = new Schema({
   lastName: String,
   dateCreated: { type: Date, default: Date.now },
   auth0Id: String,
+  isAdmin: Boolean,
   payPeriods: [
     {
       type: ObjectId,
@@ -22,7 +23,7 @@ const userSchema = new Schema({
   ]
 });
 
-export type AllUsers = {
+export type UserData = {
   user: UserDoc;
   payPeriods: PayPeriodObjects;
   repairOrders: RepairOrderObjects;
@@ -35,6 +36,7 @@ export interface UserDoc extends Document {
   lastName: string;
   dateCreated: Date;
   auth0Id: string;
+  isAdmin: boolean;
   payPeriods: [typeof ObjectId];
 }
 

@@ -11,8 +11,10 @@ const createAuthRoute = (db: typeof mongoose): Router => {
     res.status(420).json({ message });
   });
 
-  router.post('/', (req, res) => {
-    res.status(420).json({ message });
+  router.post('/login', (req, res) => {
+    // Need to send token to Auth0 for checking.
+    // Then need to store the user ID in the session
+    // And create a cookie for the session?? (Check what PointSpire does.)
   });
 
   router.patch('/', (req, res) => {
