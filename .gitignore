@@ -32,5 +32,11 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# auth config
+auth-config.json
+
+# VSCode Request Extension
+/requestTests/
+
 # vercel
 .vercel

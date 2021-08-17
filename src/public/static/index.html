@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<head>
+  <title>Repair Order Tracker API</title>
+  <style>
+    body {
+      background-color: #fefefe;
+      text-align: center;
+      display: grid;
+      grid-template-rows: 20% 100% 10%;
+    }
+    .title-container {
+      grid-row: 1;
+    }
+    .desc-container {
+      grid-row: 2;
+    }
+    .model-container {
+      display: grid;
+      grid-template-rows: repeat(5, 1fr);
+    }
+    .model-item-container {
+      display: grid;
+      grid-template-columns: 25% 75%;
+    }
+    .model-item {
+      padding: 0.5rem;
+      margin: 0;
+      background-color: aqua;
+    }
+    .prop-container {
+      text-align: left;
+      grid-template-columns: repeat();
+    }
+  </style>
+</head>
+<body>
+  <div class="title-container">
+    <h2>Repair Order Tracker API</h2>
+    <h4>Welcome!</h4>
+  </div>
+  <div class="desc-container">
+    <p>This is the index page. Theres not much here, but i'll try to give the API structure briefly. (And keep this up to date.)</p>
+    <div class="model-container">
+      <div class="model-item-container">
+        <p class="model-item">User</p>
+        <div>
+          <p>UserName: String</p>
+          <p>FirstName: String</p>
+          <p>LastName: String</p>
+          <p>DateCreated: Date</p>
+          <p>Auth0Id: String</p>
+        </div>
+      </div>
+      <div class="model-item-container">
+        <p class="model-item">Repair Order</p>
+      </div>
+    </div>
+    <div>
+      <p>Model Diagram:</p>
+      <embed
+        width="800"
+        height="600"
+        type="text/html"
+        src="../Diagrams/RepairOrderDatabaseRelationships.html"
+      />
+    </div>
+  </div>
+</body>
