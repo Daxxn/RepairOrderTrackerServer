@@ -92,8 +92,9 @@ app.use(session(sess));
 //#endregion
 
 //#region Setup Auth0 Middleware
-
-app.use('/api', auth.authCheck);
+if (process.env.USE_AUTH === 'true') {
+  app.use('/api', auth.authCheck);
+}
 //#endregion
 
 app.get('/', (req: Request, res: Response) => {
