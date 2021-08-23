@@ -8,19 +8,15 @@ import session from 'express-session';
 import mongoose from 'mongoose';
 import createApiRouter from './routes/api';
 import createAuthRoute from './routes/auth';
-import authCheck from './authCheck';
-import AuthConfigHelper from './authCheck';
+import AuthConfigHelper from './utils/authCheck';
 
 dotEnv.config();
 
 //#region Get Environment Variables
-const auth = AuthConfigHelper.buildAuthSecrets();
+const config = AuthConfigHelper.buildConfig();
 //#endregion
 
 const app = express();
-
-const mode = process.env.MODE || 'null';
-const port = process.env.PORT || 2001;
 
 app.set('views', './public/static/');
 app.set('view engine', 'pug');
@@ -58,14 +54,14 @@ const buildRoutes = (db: typeof mongoose) => {
 
 //#region Init Middleware
 const localCors: CorsOptions = {
-  origin: `${auth.localAppOrigin}${auth.localAppPort}/`
+  origin: `${config.localAppOrigin}${config.localAppPort}/`
 };
 
 const prodCors: CorsOptions = {
-  origin: auth.appOrigin,
+  origin: config.appOrigin,
   preflightContinue: true
 };
-if (process.env.MODE === 'dev') {
+if (config.env === 'dev') {
   app.use(cors(localCors));
 } else {
   app.use(cors(prodCors));
@@ -73,14 +69,14 @@ if (process.env.MODE === 'dev') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-if (mode === 'dev') {
-  app.use(logger('dev'));
+if (config.env === 'dev') {
+  app.use(logger(config.env));
 }
 //#endregion
 
 //#region Setup Session
 const sess = {
-  secret: auth.sessionSecret,
+  secret: config.sessionSecret,
   cookie: {
     secure: false
   },
@@ -92,8 +88,8 @@ app.use(session(sess));
 //#endregion
 
 //#region Setup Auth0 Middleware
-if (process.env.USE_AUTH === 'true') {
-  app.use('/api', auth.authCheck);
+if (config.useAuth == true) {
+  app.use('/api', config.authCheck);
 }
 //#endregion
 
@@ -109,14 +105,14 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 const server = http.createServer(app);
 
 const serverStartCallback = () => {
-  if (process.env.MODE === 'dev') {
-    console.log(`Server started. Listening on port: ${port}`);
+  if (config.env === 'dev') {
+    console.log(`Server started. Listening on port: ${config.port}`);
   }
 };
 
 const connectToDatabase = async () => {
-  if (auth.dbConnection) {
-    const db = await mongoose.connect(auth.dbConnection, {
+  if (config.dbConnection) {
+    const db = await mongoose.connect(config.dbConnection, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: true
@@ -128,11 +124,11 @@ const connectToDatabase = async () => {
 };
 
 const startServer = () => {
-  if (port) {
-    app.set('port', port);
+  if (config.port) {
+    app.set('port', config.port);
     connectToDatabase()
       .then(() => {
-        server.listen(port, () => serverStartCallback());
+        server.listen(config.port, () => serverStartCallback());
       })
       .catch(err => {
         throw err;
