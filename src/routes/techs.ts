@@ -6,16 +6,17 @@ import {
   createTechModel,
   TechObjects
 } from '../models/techModel';
+import MessageHelper from '../utils/messageHelper';
 
 const router = express.Router();
+const messages = MessageHelper.get();
 
 const createTechRoute = (db: typeof mongoose): Router => {
-  const message = 'I will setup AUTH later. I promise<Hopefully>.';
   const Tech: TechModel = createTechModel(db);
 
   router.get('/', async (req, res, next) => {
     try {
-      res.status(420).json({ message });
+      res.status(420).json({ message: messages.notImplemented });
     } catch (err) {
       next(err);
     }
@@ -23,7 +24,7 @@ const createTechRoute = (db: typeof mongoose): Router => {
 
   router.post('/', async (req, res, next) => {
     try {
-      res.status(420).json({ message });
+      res.status(420).json({ message: messages.notImplemented });
     } catch (err) {
       next(err);
     }
@@ -31,7 +32,7 @@ const createTechRoute = (db: typeof mongoose): Router => {
 
   router.patch('/', async (req, res, next) => {
     try {
-      res.status(420).json({ message });
+      res.status(420).json({ message: messages.notImplemented });
     } catch (err) {
       next(err);
     }
@@ -39,7 +40,7 @@ const createTechRoute = (db: typeof mongoose): Router => {
 
   router.delete('/', async (req, res, next) => {
     try {
-      res.status(420).json({ message });
+      res.status(420).json({ message: messages.notImplemented });
     } catch (err) {
       next(err);
     }

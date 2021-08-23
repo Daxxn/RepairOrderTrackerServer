@@ -3,58 +3,24 @@ import logger from 'morgan';
 import path from 'path';
 import cors, { CorsOptions } from 'cors';
 import dotEnv from 'dotenv';
-// import jwt from 'express-jwt';
-// import jwks from 'jwks-rsa';
 import http from 'http';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import createApiRouter from './routes/api';
 import createAuthRoute from './routes/auth';
+import AuthConfigHelper from './utils/authCheck';
 
 dotEnv.config();
 
-const app = express();
+//#region Get Environment Variables
+const config = AuthConfigHelper.buildConfig();
+//#endregion
 
-const mode = process.env.MODE || 'null';
-const port = process.env.PORT || 2001;
+const app = express();
+app.set('use-auth', config.useAuth);
 
 app.set('views', './public/static/');
 app.set('view engine', 'pug');
-
-//#region Get Environment Variables
-type AuthConfig = {
-  audience: string;
-  issuer: string;
-  algorythm: string;
-  dbConnection: string;
-  sessionSecret: string;
-  appOrigin: string;
-  localAppOrigin: string;
-  localAppPort: string;
-};
-
-const buildAuthSecrets = (): AuthConfig => {
-  if (process.env.AUTH0_AUDIENCE && process.env.AUTH0_ISSUER) {
-    if (process.env.APP_ORIGIN || process.env.LOCAL_APP_ORIGIN) {
-      return {
-        audience: process.env.AUTH0_AUDIENCE,
-        issuer: process.env.AUTH0_ISSUER,
-        algorythm: process.env.AUTH0_AGORYTHM,
-        dbConnection: process.env.DB_CONNECT,
-        sessionSecret: process.env.SESSION_SECRET,
-        appOrigin: process.env.APP_ORIGIN,
-        localAppOrigin: process.env.LOCAL_APP_ORIGIN,
-        localAppPort: process.env.LOCAL_APP_PORT
-      };
-    }
-    throw new Error(
-      'Cannot find app origin. An origin needs to be specified. Check ENV file.'
-    );
-  }
-  throw new Error('Cannot authorize. Check ENV file.');
-};
-const auth = buildAuthSecrets();
-//#endregion
 
 //#region Build Routes
 const buildLogoutRoute = () => {
@@ -81,7 +47,7 @@ const buildLogoutRoute = () => {
 };
 
 const buildRoutes = (db: typeof mongoose) => {
-  app.use('/api', createApiRouter(db));
+  app.use('/api', createApiRouter(db, config));
   app.use('/auth', createAuthRoute(db));
   buildLogoutRoute();
 };
@@ -89,14 +55,14 @@ const buildRoutes = (db: typeof mongoose) => {
 
 //#region Init Middleware
 const localCors: CorsOptions = {
-  origin: `${auth.localAppOrigin}${auth.localAppPort}/`
+  origin: `${config.localAppOrigin}${config.localAppPort}/`
 };
 
 const prodCors: CorsOptions = {
-  origin: auth.appOrigin,
+  origin: config.appOrigin,
   preflightContinue: true
 };
-if (process.env.MODE === 'dev') {
+if (config.env === 'dev') {
   app.use(cors(localCors));
 } else {
   app.use(cors(prodCors));
@@ -104,14 +70,14 @@ if (process.env.MODE === 'dev') {
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
-if (mode === 'dev') {
-  app.use(logger('dev'));
+if (config.env === 'dev') {
+  app.use(logger(config.env));
 }
 //#endregion
 
 //#region Setup Session
 const sess = {
-  secret: auth.sessionSecret,
+  secret: config.sessionSecret,
   cookie: {
     secure: false
   },
@@ -123,23 +89,9 @@ app.use(session(sess));
 //#endregion
 
 //#region Setup Auth0 Middleware
-// const jwtCheck = jwt({
-//   secret: jwks.expressJwtSecret({
-//     cache: true,
-//     rateLimit: true,
-//     jwksRequestsPerMinute: 5,
-//     jwksUri: 'https://dev-6ryc0ksm.us.auth0.com/.well-known/jwks.json'
-//   }),
-//   audience: auth.audience,
-//   issuer: auth.issuer,
-//   algorithms: [auth.algorythm]
-// });
-
-// app.use(jwtCheck);
-
-// app.get('/authorized', (req: Request, res: Response) => {
-//   res.send('Secured Resource');
-// });
+if (config.useAuth == true) {
+  app.use('/api', config.authCheck);
+}
 //#endregion
 
 app.get('/', (req: Request, res: Response) => {
@@ -154,14 +106,14 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 const server = http.createServer(app);
 
 const serverStartCallback = () => {
-  if (process.env.MODE === 'dev') {
-    console.log(`Server started. Listening on port: ${port}`);
+  if (config.env === 'dev') {
+    console.log(`Server started. Listening on port: ${config.port}`);
   }
 };
 
 const connectToDatabase = async () => {
-  if (auth.dbConnection) {
-    const db = await mongoose.connect(auth.dbConnection, {
+  if (config.dbConnection) {
+    const db = await mongoose.connect(config.dbConnection, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: true
@@ -173,11 +125,11 @@ const connectToDatabase = async () => {
 };
 
 const startServer = () => {
-  if (port) {
-    app.set('port', port);
+  if (config.port) {
+    app.set('port', config.port);
     connectToDatabase()
       .then(() => {
-        server.listen(port, () => serverStartCallback());
+        server.listen(config.port, () => serverStartCallback());
       })
       .catch(err => {
         throw err;

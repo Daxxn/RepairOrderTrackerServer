@@ -1,8 +1,13 @@
-import mongoose, { Model, Schema, Document} from 'mongoose';
+import mongoose, { Model, Schema, Document, ObjectId} from 'mongoose';
 
 const ObjectId = mongoose.Types.ObjectId;
 
 const payPeriodSchema = new Schema({
+  userId: {
+    type: ObjectId,
+    ref: 'User',
+    required: true,
+  },
   startDate: {
     type: Date,
     default: Date.now
@@ -28,6 +33,7 @@ export type AllPayPeriods = {
 };
 
 export interface PayPeriodDoc extends Document {
+  userId: typeof ObjectId,
   startDate: Date,
   endDate: Date,
   repairOrders: [typeof ObjectId]

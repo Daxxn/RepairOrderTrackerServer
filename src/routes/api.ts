@@ -6,15 +6,21 @@ import createPayPeriodRoute from './payPeriods';
 import createRepairOrderRoute from './repairOrders';
 import createTechRoute from './techs';
 import createUserRoute from './users';
+import { AuthConfig } from '../utils/authCheck';
 
 /**
  * Creates the express Router for the `/api` endpoint.
+ * Then inserts the authorization check middleware if
+ * the USE_AUTH env variable is true.
  *
  * @param {mongoose} db the connected MongoDB database
  * @returns {Router} the Router for the `/api` endpoint
  */
-function createApiRouter(db: typeof mongoose): Router {
-  router.use('/users', createUserRoute(db));
+function createApiRouter(db: typeof mongoose, config: AuthConfig): Router {
+  if (config.useAuth) {
+    router.use(config.authCheck);
+  }
+  router.use('/users', createUserRoute(db, config));
   router.use('/jobs', createJobRoute(db));
   router.use('/pay-periods', createPayPeriodRoute(db));
   router.use('/repair-orders', createRepairOrderRoute(db));
