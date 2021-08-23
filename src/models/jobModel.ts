@@ -4,6 +4,11 @@ import { TechObjects } from './techModel';
 const ObjectId = mongoose.Types.ObjectId;
 
 const jobSchema = new Schema({
+  userId: {
+    type: String,
+    ref: 'User',
+    required: true,
+  },
   name: {
     type: String,
     required: true
@@ -24,6 +29,7 @@ export type JobObjects = {
 }
 
 export interface JobDoc extends Document {
+  userId: typeof ObjectId,
   name: string;
   description: string;
   time: number;

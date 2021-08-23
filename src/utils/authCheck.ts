@@ -1,5 +1,8 @@
 import jwt, { RequestHandler } from 'express-jwt';
 import jwks from 'jwks-rsa';
+import dotEnv from 'dotenv';
+
+dotEnv.config();
 
 export type EnvOption = 'dev' | 'prod' | 'stage';
 
@@ -22,7 +25,6 @@ export interface AuthConfig {
 export default class AuthConfigHelper {
   static auth: AuthConfig;
   private static buildAuth() {
-    console.log(process.env);
     if (process.env.AUTH0_AUDIENCE && process.env.AUTH0_ISSUER) {
       if (process.env.APP_ORIGIN || process.env.LOCAL_APP_ORIGIN) {
         this.auth = {

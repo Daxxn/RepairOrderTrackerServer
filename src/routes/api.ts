@@ -6,7 +6,7 @@ import createPayPeriodRoute from './payPeriods';
 import createRepairOrderRoute from './repairOrders';
 import createTechRoute from './techs';
 import createUserRoute from './users';
-import AuthConfigHelper, { AuthConfig } from '../utils/authCheck';
+import { AuthConfig } from '../utils/authCheck';
 
 /**
  * Creates the express Router for the `/api` endpoint.
@@ -16,12 +16,11 @@ import AuthConfigHelper, { AuthConfig } from '../utils/authCheck';
  * @param {mongoose} db the connected MongoDB database
  * @returns {Router} the Router for the `/api` endpoint
  */
-function createApiRouter(db: typeof mongoose): Router {
-  const authData = AuthConfigHelper.getAuthConfig();
-  if (authData.useAuth) {
-    router.use(authData.authCheck);
+function createApiRouter(db: typeof mongoose, config: AuthConfig): Router {
+  if (config.useAuth) {
+    router.use(config.authCheck);
   }
-  router.use('/users', createUserRoute(db));
+  router.use('/users', createUserRoute(db, config));
   router.use('/jobs', createJobRoute(db));
   router.use('/pay-periods', createPayPeriodRoute(db));
   router.use('/repair-orders', createRepairOrderRoute(db));

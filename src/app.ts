@@ -17,6 +17,7 @@ const config = AuthConfigHelper.buildConfig();
 //#endregion
 
 const app = express();
+app.set('use-auth', config.useAuth);
 
 app.set('views', './public/static/');
 app.set('view engine', 'pug');
@@ -46,7 +47,7 @@ const buildLogoutRoute = () => {
 };
 
 const buildRoutes = (db: typeof mongoose) => {
-  app.use('/api', createApiRouter(db));
+  app.use('/api', createApiRouter(db, config));
   app.use('/auth', createAuthRoute(db));
   buildLogoutRoute();
 };

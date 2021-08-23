@@ -3,6 +3,11 @@ import mongoose, { Model, Schema, Document} from 'mongoose';
 const ObjectId = mongoose.Types.ObjectId;
 
 const repairOrderSchema = new Schema({
+  userId: {
+    type: ObjectId,
+    ref: 'User',
+    required: true,
+  },
   roNumber: Number,
   date: Date,
   isCompleted: Boolean,
@@ -23,6 +28,7 @@ export type RepairOrderObjects = {
 }
 
 export interface RepairOrderDoc extends Document {
+  userId: typeof ObjectId,
   roNumber: number;
   date: Date;
   isCompleted: boolean;

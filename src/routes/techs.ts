@@ -12,7 +12,6 @@ const router = express.Router();
 const messages = MessageHelper.get();
 
 const createTechRoute = (db: typeof mongoose): Router => {
-  const message = 'I will setup AUTH later. I promise<Hopefully>.';
   const Tech: TechModel = createTechModel(db);
 
   router.get('/', async (req, res, next) => {
