@@ -5,7 +5,7 @@ import {
   RepairOrderModel,
   createRepairOrderModel,
   RepairOrderDoc,
-} from '../models/repairorderModel';
+} from '../models/repairOrderModel';
 import {
   PayPeriodModel,
   createPayPeriodModel,

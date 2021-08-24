@@ -1,7 +1,7 @@
 import {
   RepairOrderDoc,
   RepairOrderModel,
-} from '../models/repairorderModel';
+} from '../models/repairOrderModel';
 import { PayPeriodDoc, PayPeriodModel } from '../models/payperiodModel';
 import { UserDoc } from '../models/userModel';
 import { JobDoc, JobModel } from '../models/jobModel';

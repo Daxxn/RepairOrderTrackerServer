@@ -7,6 +7,9 @@ import createRepairOrderRoute from './repairOrders';
 import createTechRoute from './techs';
 import createUserRoute from './users';
 import { AuthConfig } from '../utils/authCheck';
+import MessageHelper from '../utils/messageHelper';
+
+const messages = MessageHelper.get();
 
 /**
  * Creates the express Router for the `/api` endpoint.

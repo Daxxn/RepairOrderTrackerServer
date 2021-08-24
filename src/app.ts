@@ -4,15 +4,17 @@ import path from 'path';
 import cors, { CorsOptions } from 'cors';
 import dotEnv from 'dotenv';
 import http from 'http';
-import session from 'express-session';
+import session, { Session, SessionOptions, SessionData } from 'express-session';
 import mongoose from 'mongoose';
 import createApiRouter from './routes/api';
 import createAuthRoute from './routes/auth';
 import AuthConfigHelper from './utils/authCheck';
+import MongoStore from 'connect-mongo';
+import { ConnectMongoOptions } from 'connect-mongo/build/main/lib/MongoStore';
 
 dotEnv.config();
 
-//#region Get Environment Variables
+// #region Get Environment Variables
 const config = AuthConfigHelper.buildConfig();
 //#endregion
 
@@ -22,7 +24,7 @@ app.set('use-auth', config.useAuth);
 app.set('views', './public/static/');
 app.set('view engine', 'pug');
 
-//#region Build Routes
+// #region Build Routes
 const buildLogoutRoute = () => {
   app.get('/logout', (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -53,15 +55,27 @@ const buildRoutes = (db: typeof mongoose) => {
 };
 //#endregion
 
-//#region Init Middleware
+// #region Init Middleware
 const localCors: CorsOptions = {
-  origin: `${config.localAppOrigin}${config.localAppPort}/`,
+  allowedHeaders: [
+    'Content-Type',
+    'Access-Control-Allow-Origin',
+    'Authorization',
+  ],
+  origin: `http://localhost:3000`,
 };
+
+app.options('/', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+})
+
+console.log(localCors);
 
 const prodCors: CorsOptions = {
   origin: config.appOrigin,
   preflightContinue: true,
 };
+
 if (config.env === 'dev') {
   app.use(cors(localCors));
 } else {
@@ -75,24 +89,42 @@ if (config.env === 'dev') {
 }
 //#endregion
 
-//#region Setup Session
-const sess = {
+// #region Setup Session
+declare module 'express-session' {
+  interface SessionData {
+    accessToken?: string;
+    userId?: string;
+  }
+}
+
+const storeOptions: ConnectMongoOptions = {
+  mongoUrl: process.env.DB_CONNECT,
+  dbName: 'ROTracker',
+};
+
+const sess: SessionOptions = {
   secret: config.sessionSecret,
   cookie: {
     secure: false,
   },
   resave: true,
   saveUninitialized: true,
+  store: MongoStore.create(storeOptions),
 };
 
-app.use(session(sess));
-//#endregion
+if (app.get('env') === 'production') {
+  app.set('trust-proxy', 1);
+  sess.cookie.secure = true;
+}
 
-//#region Setup Auth0 Middleware
+app.use(session(sess));
+// #endregion
+
+// #region Setup Auth0 Middleware
 if (config.useAuth == true) {
   app.use('/api', config.authCheck);
 }
-//#endregion
+// #endregion
 
 app.get('/', (req: Request, res: Response) => {
   res
@@ -104,7 +136,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json(err);
 });
 
-//#region Start Server
+// #region Start Server
 const server = http.createServer(app);
 
 const serverStartCallback = () => {
@@ -144,4 +176,4 @@ const startServer = () => {
 };
 
 startServer();
-//#endregion
+// #endregion

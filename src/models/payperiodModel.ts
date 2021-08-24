@@ -5,7 +5,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const payPeriodSchema = new Schema({
   userId: {
     type: ObjectId,
-    ref: 'User',
+    ref: 'users',
     required: true,
   },
   startDate: {
@@ -19,7 +19,7 @@ const payPeriodSchema = new Schema({
   repairOrders: [
     {
       type: ObjectId,
-      ref: 'RepairOrder',
+      ref: 'repair-orders',
     },
   ],
 });
@@ -47,5 +47,5 @@ export type PayPeriodModel = Model<PayPeriodDoc>;
  * @returns {PayPeriodModel} the UserModel class
  */
 export function createPayPeriodModel(db: typeof mongoose): PayPeriodModel {
-  return db.model<PayPeriodDoc>('PayPeriod', payPeriodSchema);
+  return db.model<PayPeriodDoc>('pay-periods', payPeriodSchema);
 }

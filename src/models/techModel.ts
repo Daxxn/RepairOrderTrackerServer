@@ -6,23 +6,17 @@ const ObjectId = mongoose.Types.ObjectId;
 const techSchema = new Schema({
   userId: {
     type: ObjectId,
-    ref: 'User',
+    ref: 'users',
     required: true,
   },
   name: {
     type: String,
     required: true,
   },
-  idNumber: {
+  techNumber: {
     type: Number,
     required: true,
-  },
-  activeJobs: [
-    {
-      type: ObjectId,
-      ref: 'Job',
-    },
-  ],
+  }
 });
 
 export type AllTechs = {
@@ -37,12 +31,11 @@ export type TechObjects = {
 export interface TechDoc extends Document {
   userId: typeof ObjectId;
   name: string;
-  idNumber: string;
-  activeJobs: [typeof ObjectId];
+  techNumber: string;
 }
 
 export type TechModel = Model<TechDoc>;
 
 export function createTechModel(db: typeof mongoose): TechModel {
-  return db.model<TechDoc>('Tech', techSchema);
+  return db.model<TechDoc>('techs', techSchema);
 }

@@ -3,7 +3,7 @@ import {
   RepairOrderDoc,
   RepairOrderModel,
   RepairOrderObjects,
-} from '../models/repairorderModel';
+} from '../models/repairOrderModel';
 import { TechDoc, TechModel, TechObjects } from '../models/techModel';
 import {
   PayPeriodDoc,

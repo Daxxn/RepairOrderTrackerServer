@@ -6,7 +6,7 @@ import { UserModel, createUserModel } from '../models/userModel';
 import {
   RepairOrderModel,
   createRepairOrderModel,
-} from '../models/repairorderModel';
+} from '../models/repairOrderModel';
 
 const router = express.Router();
 const messages = MessageHelper.get();

@@ -6,7 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const jobSchema = new Schema({
   userId: {
     type: String,
-    ref: 'User',
+    ref: 'users',
     required: true,
   },
   name: {
@@ -40,5 +40,5 @@ export interface JobDoc extends Document {
 export type JobModel = Model<JobDoc>;
 
 export function createJobModel(db: typeof mongoose): JobModel {
-  return db.model<JobDoc>('Job', jobSchema);
+  return db.model<JobDoc>('jobs', jobSchema);
 }

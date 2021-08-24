@@ -8,6 +8,7 @@ export default interface MessageHelper {
   userDeleted: string;
   noId: string;
   adminOnlyForUsers: string;
+  noAuthToken: string;
   modelNotFound: <T>(model: T) => string;
 }
 
@@ -22,6 +23,7 @@ export default class MessageHelper {
     userDeleted: 'user sucessfully deleted.',
     needToSetupAuth: 'Auth is disabled. WIP.',
     adminOnlyForUsers: 'Only admins can access all users.',
+    noAuthToken: 'No authorization token was found.',
     modelNotFound: <T>(model: T) => {
       return `Model not found in database: ${typeof model}`;
     },

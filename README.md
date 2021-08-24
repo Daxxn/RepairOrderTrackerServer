@@ -1,8 +1,8 @@
-## Repair Order Tracker App
+# Repair Order Tracker App
 
-This is the database API where the connections for the front-end will be handled.
+This is the database API where the connection to the front-end will be handled. Incuding the typical REST & CRUD methods, authentication, and session management.
 
----
+----
 
 This is going to be where I try to describe what the hell im doing.
 
@@ -24,7 +24,7 @@ The basics of a database access and management system is the essentials and afte
 
 > The `Front-End`: This is not too bad. `React` framework with `TypeScript`. Nothing special. Except authentication is handled with `Auth0`. [Next.js](https://nextjs.org/docs/getting-started) was concidered but its not as usefull for me. Things like documentation arent a big deal. Info is pretty easy to come by. Probably going to use [Netlify](https://www.netlify.com/products/workflow/) for hosting. Theres not much more to say. Im **not** going to use [Material-UI](https://material-ui.com/) or something similar. I **am** going to try to conform to the principles of Material Design. This is a good oportunity to learn how to create modern UIs with CSS and my own two hands. This mostly has to function. Fancy can come later.
 
-### The Current Feature List:
+## The Current Feature List:
 
 - Store modify and recall data from the database
 - Assign techs to a repair order, connect jobs to that repair order, and store the repair orders in a pay period.
@@ -33,22 +33,26 @@ The basics of a database access and management system is the essentials and afte
 - Keep a rolling history of work completed by a team.
 - Chart the data recieved in the app.
 
-### The Current Technology List:
+## The Current Technology List:
 
-- React
-- Express
-- Auth0
-- Typescript
-- Mongoose
-- MongoDB
-- Atlas
-- Docker
+* React
+* Express
+* Auth0
+* Typescript
+* Mongoose
+* MongoDB
+* Atlas
+* Docker
+* Swagger
 
-#### Theres no timeline. I don't know when this will be done.
+##### Theres no timeline. I don't know when this will be done.
 
----
+----
 
-### Running the dev environment:
+# Running this thing
+
+## Running the dev environment:
+
 
 - Pull the repository from github
 - create and set the `.env` file.
@@ -57,6 +61,15 @@ The basics of a database access and management system is the essentials and afte
 - Go to the local host specified by the `.env` file.
 - Testing the API endpoints can be done with the `REST Client` VSCode extension. (Im going to setup Swagger soon.)
 
-### Deplyment:
+## Deplyment:
+
+### **Creating the Docker container:**
+
+(WIP)
+
+### **Production Build
+
+- Set the `.env` mode to `prod`
+- run `npm build`
 
 When I know how to deploy this bad boy, this is where the walkthrough will be.

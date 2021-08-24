@@ -14,7 +14,7 @@ import {
   RepairOrderModel,
   createRepairOrderModel,
   RepairOrderObjects,
-} from '../models/repairorderModel';
+} from '../models/repairOrderModel';
 import { BaseDoc, BaseObjects } from '../utils/types';
 import DbFunctions from '../utils/dbFunctions';
 import { JobModel, createJobModel, JobObjects } from '../models/jobModel';
@@ -67,6 +67,11 @@ const createUserRoute = (
   const Job: JobModel = createJobModel(db);
   const Tech: TechModel = createTechModel(db);
 
+  // router.options('/', (req, res, next) => {
+  //   res.setHeader('Access-Control-Allow-Credentials', 'true');
+  //   next();
+  // });
+
   router.get(
     '/',
     async (req: Request, res: Response, next: NextFunction) => {
@@ -82,6 +87,42 @@ const createUserRoute = (
       }
     }
   );
+
+  router.get('/username/:userName', async (req, res, next) => {
+    try {
+      const { userName } = req.params;
+      if (userName) {
+        const foundUser = await User.findOne({ userName: userName });
+        if (foundUser) {
+          res.status(200).json(foundUser);
+        } else {
+          res.status(400).json({ message: messages.noUserFound });
+        }
+      } else {
+        res.status(400).json({ message: messages.noUserName });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get('/email/:email', async (req, res, next) => {
+    try {
+      const { email } = req.params;
+      if (email) {
+        const foundUser = await User.findOne({ email: email });
+        if (foundUser) {
+          res.status(200).json(foundUser);
+        } else {
+          res.status(400).json({ message: messages.noUserFound });
+        }
+      } else {
+        res.status(400).json({ message: messages.noUserName });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
 
   router.get('/:id', async (req, res, next) => {
     try {
@@ -122,22 +163,22 @@ const createUserRoute = (
     '/',
     async (req: Request, res: Response, next: NextFunction) => {
       try {
-        const { userName } = req.body;
-        if (userName) {
-          const foundUser = await User.find({
-            userName,
+        const { email } = req.body;
+        if (email) {
+          const foundUser = await User.findOne({
+            email: email,
           });
           console.log(foundUser);
-          if (foundUser.length <= 0) {
+          if (!foundUser) {
             const newUser = new User({
-              userName,
+              email: email,
             });
             await newUser.save();
+            req.session.userId = newUser._id;
             res.status(201).json(newUser);
           } else {
-            res.status(400).json({
-              message: messages.userNameExists,
-            });
+            req.session.userId = foundUser._id;
+            res.status(200).json(foundUser);
           }
         } else {
           res.status(400).json({
