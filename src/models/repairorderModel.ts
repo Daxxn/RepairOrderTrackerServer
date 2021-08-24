@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Document} from 'mongoose';
+import mongoose, { Model, Schema, Document } from 'mongoose';
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -14,9 +14,9 @@ const repairOrderSchema = new Schema({
   jobs: [
     {
       type: ObjectId,
-      ref: 'Job'
-    }
-  ]
+      ref: 'Job',
+    },
+  ],
 });
 
 export type AllRepairOrders = {
@@ -25,10 +25,10 @@ export type AllRepairOrders = {
 
 export type RepairOrderObjects = {
   [id: string]: RepairOrderDoc;
-}
+};
 
 export interface RepairOrderDoc extends Document {
-  userId: typeof ObjectId,
+  userId: typeof ObjectId;
   roNumber: number;
   date: Date;
   isCompleted: boolean;
@@ -37,6 +37,8 @@ export interface RepairOrderDoc extends Document {
 
 export type RepairOrderModel = Model<RepairOrderDoc>;
 
-export function createRepairOrderModel(db: typeof mongoose): RepairOrderModel {
+export function createRepairOrderModel(
+  db: typeof mongoose
+): RepairOrderModel {
   return db.model<RepairOrderDoc>('RepairOrder', repairOrderSchema);
 }

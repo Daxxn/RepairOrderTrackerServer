@@ -11,4 +11,4 @@ services:
     ports:
       - 2000:2000
       - 9229:9229
-    command: ["node", "--inspect=0.0.0.0:9229", "build/app.js"]
+    command: ['node', '--inspect=0.0.0.0:9229', 'build/app.js']

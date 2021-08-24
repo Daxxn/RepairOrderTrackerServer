@@ -55,12 +55,12 @@ const buildRoutes = (db: typeof mongoose) => {
 
 //#region Init Middleware
 const localCors: CorsOptions = {
-  origin: `${config.localAppOrigin}${config.localAppPort}/`
+  origin: `${config.localAppOrigin}${config.localAppPort}/`,
 };
 
 const prodCors: CorsOptions = {
   origin: config.appOrigin,
-  preflightContinue: true
+  preflightContinue: true,
 };
 if (config.env === 'dev') {
   app.use(cors(localCors));
@@ -79,10 +79,10 @@ if (config.env === 'dev') {
 const sess = {
   secret: config.sessionSecret,
   cookie: {
-    secure: false
+    secure: false,
   },
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
 };
 
 app.use(session(sess));
@@ -95,7 +95,9 @@ if (config.useAuth == true) {
 //#endregion
 
 app.get('/', (req: Request, res: Response) => {
-  res.status(200).sendFile('./public/static/index.html', { root: __dirname });
+  res
+    .status(200)
+    .sendFile('./public/static/index.html', { root: __dirname });
 });
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -116,7 +118,7 @@ const connectToDatabase = async () => {
     const db = await mongoose.connect(config.dbConnection, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useFindAndModify: true
+      useFindAndModify: true,
     });
     buildRoutes(db);
   } else {

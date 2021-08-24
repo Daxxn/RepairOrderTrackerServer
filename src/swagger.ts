@@ -5,41 +5,40 @@ const def: SwaggerDefinition = {
   info: {
     title: 'Repair Order Tracker API',
     version: '1.0.0',
-    description: 'Handles database access for the Repair Order Tracker App. (http://www.repairordertracker.com)',
+    description:
+      'Handles database access for the Repair Order Tracker App. (http://www.repairordertracker.com)',
   },
   servers: [
     {
       url: 'http://localhost:2000/api',
       description: 'local dev server',
-    }
+    },
   ],
   tags: [
     {
       name: 'User',
-      description: 'User Operations'
+      description: 'User Operations',
     },
     {
       name: 'PayPeriods',
-      description: 'PayPeriod Operations'
+      description: 'PayPeriod Operations',
     },
     {
       name: 'RepairOrders',
-      description: 'RepairOrder Operations'
+      description: 'RepairOrder Operations',
     },
     {
       name: 'Techs',
-      description: 'Tech Operations'
+      description: 'Tech Operations',
     },
     {
       name: 'Jobs',
-      description: 'Job Operations'
-    }
+      description: 'Job Operations',
+    },
   ],
   components: {
-    parameters: {
-      
-    }
-  }
+    parameters: {},
+  },
 };
 
 const options: Options = {

@@ -2,18 +2,27 @@ import bodyParser from 'body-parser';
 import express, { Router, Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import MessageHelper from '../utils/messageHelper';
+import { UserModel, UserDoc, createUserModel } from '../models/userModel';
 import {
-  UserModel,
-  UserDoc,
-  createUserModel
-} from '../models/userModel';
-import { createPayPeriodModel, PayPeriodDoc, PayPeriodModel, PayPeriodObjects } from '../models/payperiodModel';
+  createPayPeriodModel,
+  PayPeriodDoc,
+  PayPeriodModel,
+  PayPeriodObjects,
+} from '../models/payperiodModel';
 import { AuthConfig } from '../utils/authCheck';
-import { RepairOrderModel, createRepairOrderModel, RepairOrderObjects } from '../models/repairorderModel';
+import {
+  RepairOrderModel,
+  createRepairOrderModel,
+  RepairOrderObjects,
+} from '../models/repairorderModel';
 import { BaseDoc, BaseObjects } from '../utils/types';
 import DbFunctions from '../utils/dbFunctions';
 import { JobModel, createJobModel, JobObjects } from '../models/jobModel';
-import { TechModel, createTechModel, TechObjects } from '../models/techModel';
+import {
+  TechModel,
+  createTechModel,
+  TechObjects,
+} from '../models/techModel';
 
 const router = express.Router();
 const messages = MessageHelper.get();
@@ -48,7 +57,10 @@ const messages = MessageHelper.get();
 //   return objects;
 // };
 
-const createUserRoute = (db: typeof mongoose, config: AuthConfig): Router => {
+const createUserRoute = (
+  db: typeof mongoose,
+  config: AuthConfig
+): Router => {
   const User: UserModel = createUserModel(db);
   const PayPeriods: PayPeriodModel = createPayPeriodModel(db);
   const RepairOrder: RepairOrderModel = createRepairOrderModel(db);
@@ -78,9 +90,18 @@ const createUserRoute = (db: typeof mongoose, config: AuthConfig): Router => {
       if (foundUser) {
         console.log('Logging found user paystub IDs');
         console.log(Object.keys(foundUser.payPeriods));
-        const payPeriods = await DbFunctions.findByIds(Object.keys(foundUser.payPeriods), PayPeriods) as PayPeriodObjects;
-        const repairOrders = await DbFunctions.findByIds(Object.keys(payPeriods), RepairOrder) as RepairOrderObjects;
-        const jobs = await DbFunctions.findByIds(Object.keys(repairOrders), Job);
+        const payPeriods = (await DbFunctions.findByIds(
+          Object.keys(foundUser.payPeriods),
+          PayPeriods
+        )) as PayPeriodObjects;
+        const repairOrders = (await DbFunctions.findByIds(
+          Object.keys(payPeriods),
+          RepairOrder
+        )) as RepairOrderObjects;
+        const jobs = await DbFunctions.findByIds(
+          Object.keys(repairOrders),
+          Job
+        );
         const techs = await DbFunctions.findByIds(Object.keys(jobs), Tech);
         res.status(200).json({
           user: foundUser,
@@ -104,12 +125,12 @@ const createUserRoute = (db: typeof mongoose, config: AuthConfig): Router => {
         const { userName } = req.body;
         if (userName) {
           const foundUser = await User.find({
-            userName
+            userName,
           });
           console.log(foundUser);
           if (foundUser.length <= 0) {
             const newUser = new User({
-              userName
+              userName,
             });
             await newUser.save();
             res.status(201).json(newUser);

@@ -1,0 +1,7 @@
+{
+  "prettier.arrowParens": "avoid",
+  "prettier.configPath": "./prettierrc.json",
+  "prettier.documentSelectors": [
+    "/src/**"
+  ]
+}

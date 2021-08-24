@@ -18,9 +18,9 @@ const userSchema = new Schema({
   payPeriods: [
     {
       type: ObjectId,
-      ref: 'PayPeriod'
-    }
-  ]
+      ref: 'PayPeriod',
+    },
+  ],
 });
 
 export type UserData = {

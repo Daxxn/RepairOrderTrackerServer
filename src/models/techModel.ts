@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Document} from 'mongoose';
+import mongoose, { Model, Schema, Document } from 'mongoose';
 import { JobObjects } from './jobModel';
 
 const ObjectId = mongoose.Types.ObjectId;
@@ -20,23 +20,23 @@ const techSchema = new Schema({
   activeJobs: [
     {
       type: ObjectId,
-      ref: 'Job'
-    }
-  ]
+      ref: 'Job',
+    },
+  ],
 });
 
 export type AllTechs = {
-  data: TechDoc,
+  data: TechDoc;
   activeJobs: JobObjects;
 };
 
 export type TechObjects = {
   [id: string]: TechDoc;
-}
+};
 
 export interface TechDoc extends Document {
   userId: typeof ObjectId;
-  name:string;
+  name: string;
   idNumber: string;
   activeJobs: [typeof ObjectId];
 }

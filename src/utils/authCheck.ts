@@ -20,7 +20,7 @@ export interface AuthConfig {
   localAppPort: string;
 
   authCheck?: RequestHandler | null;
-};
+}
 
 export default class AuthConfigHelper {
   static auth: AuthConfig;
@@ -74,11 +74,11 @@ export default class AuthConfigHelper {
         cache: true,
         rateLimit: true,
         jwksRequestsPerMinute: 5,
-        jwksUri: 'https://dev-6ryc0ksm.us.auth0.com/.well-known/jwks.json'
+        jwksUri: 'https://dev-6ryc0ksm.us.auth0.com/.well-known/jwks.json',
       }),
       audience: this.auth.audience,
       issuer: this.auth.issuer,
-      algorithms: [this.auth.algorythm]
+      algorithms: [this.auth.algorythm],
     });
   }
 

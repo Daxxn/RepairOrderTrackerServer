@@ -9,7 +9,7 @@ const messages = MessageHelper.get();
 /**
  * I may not need to do this. The Auth0 server will
  * take care of it??
- * @param db 
+ * @param db
  * @returns {Router} Router
  */
 const createAuthRoute = (db: typeof mongoose): Router => {

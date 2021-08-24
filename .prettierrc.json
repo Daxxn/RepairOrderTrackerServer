@@ -3,5 +3,13 @@
   "arrowParens": "avoid",
   "endOfLine": "lf",
   "printWidth": 75,
-  "quoteProps": "consistent"
+  "quoteProps": "consistent",
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "semi": true,
+  "tabWidth": 2,
+  "useTabs": false,
+  "jsxBracketSameLine": false,
+  "overrides": [],
+  "embeddedLanguageFormatting": "auto"
 }

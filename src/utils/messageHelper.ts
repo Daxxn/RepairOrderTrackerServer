@@ -9,10 +9,10 @@ export default interface MessageHelper {
   noId: string;
   adminOnlyForUsers: string;
   modelNotFound: <T>(model: T) => string;
-};
+}
 
 export default class MessageHelper {
-  private static _messageHelper:MessageHelper = {
+  private static _messageHelper: MessageHelper = {
     notImplemented: 'I will setup AUTH later. I Promise<Hopefully>.',
     noBody: 'Request body not found.',
     noUserFound: 'No user with that username found.',
