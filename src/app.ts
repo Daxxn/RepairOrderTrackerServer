@@ -15,6 +15,7 @@ import createAuthRoute from './routes/auth';
 import AuthConfigHelper from './utils/authCheck';
 import MongoStore from 'connect-mongo';
 import { ConnectMongoOptions } from 'connect-mongo/build/main/lib/MongoStore';
+import createSessionTestRoute from './routes/sessionTest';
 
 dotEnv.config();
 
@@ -55,6 +56,9 @@ const buildLogoutRoute = () => {
 const buildRoutes = (db: typeof mongoose) => {
   app.use('/api', createApiRouter(db, config));
   app.use('/auth', createAuthRoute(db));
+  if (config.env === 'dev') {
+    app.use('/session', createSessionTestRoute(db));
+  }
   buildLogoutRoute();
 };
 //#endregion
@@ -66,7 +70,9 @@ const localCors: CorsOptions = {
     'Access-Control-Allow-Origin',
     'Authorization',
   ],
-  origin: `http://localhost:3000`,
+  origin: [
+    'http://localhost:3000',
+  ],
 };
 
 app.options('/', (req, res, next) => {
@@ -110,6 +116,7 @@ const sess: SessionOptions = {
   secret: config.sessionSecret,
   cookie: {
     secure: false,
+    maxAge: 10 * 60 * 60 * 1000,
   },
   resave: true,
   saveUninitialized: true,
@@ -130,6 +137,7 @@ if (config.useAuth == true) {
 }
 // #endregion
 
+// #region Other Middleware
 app.get('/', (req: Request, res: Response) => {
   res
     .status(200)
@@ -139,6 +147,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).json(err);
 });
+// #endregion
 
 // #region Start Server
 const server = http.createServer(app);

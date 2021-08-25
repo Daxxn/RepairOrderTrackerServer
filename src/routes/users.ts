@@ -1,11 +1,9 @@
-import bodyParser from 'body-parser';
 import express, { Router, Request, Response, NextFunction } from 'express';
-import mongoose, { FilterQuery } from 'mongoose';
+import mongoose from 'mongoose';
 import MessageHelper from '../utils/messageHelper';
-import { UserModel, UserDoc, createUserModel } from '../models/userModel';
+import { UserModel, createUserModel } from '../models/userModel';
 import {
   createPayPeriodModel,
-  PayPeriodDoc,
   PayPeriodModel,
   PayPeriodObjects,
 } from '../models/payperiodModel';
@@ -15,7 +13,7 @@ import {
   createRepairOrderModel,
   RepairOrderObjects,
 } from '../models/repairOrderModel';
-import { BaseDoc, BaseModel, BaseObject, BaseType } from '../utils/types';
+import { BaseDoc, BaseObject } from '../utils/types';
 import DbFunctions from '../utils/dbFunctions';
 import { JobModel, createJobModel, JobObjects } from '../models/jobModel';
 import {
@@ -26,36 +24,6 @@ import {
 
 const router = express.Router();
 const messages = MessageHelper.get();
-
-// const populateUserData = async (user: UserDoc): Promise<UserDoc> => {
-//   return await user.populate('payPeriods').execPopulate();
-// };
-
-// const getUserPayperiods = async (user: UserDoc, payPeriods: PayPeriodModel): Promise<PayPeriodDoc[]> => {
-//   return await payPeriods.find({
-//     _id: user.payPeriods,
-//   });
-// };
-
-// const buildPayPeriodObjects = (payPeriods: PayPeriodDoc[]): PayPeriodObjects => {
-//   const payPeriodObjects: PayPeriodObjects = {};
-//   if (payPeriods.length > 0) {
-//     Object.values(payPeriods).forEach(pp => {
-//       payPeriodObjects[pp._id] = pp;
-//     });
-//   }
-//   return payPeriodObjects;
-// };
-
-// const buildObjects = (docs: BaseDoc[]): BaseObjects => {
-//   const objects: BaseObjects = {};
-//   if (docs.length > 0) {
-//     Object.values(docs).forEach(doc => {
-//       objects[doc._id] = doc;
-//     });
-//   }
-//   return objects;
-// };
 
 const constructDict = (data: BaseDoc[]): BaseObject => {
   const output: BaseObject = {};
@@ -123,11 +91,6 @@ const createUserRoute = (
   const RepairOrder: RepairOrderModel = createRepairOrderModel(db);
   const Job: JobModel = createJobModel(db);
   const Tech: TechModel = createTechModel(db);
-
-  // router.options('/', (req, res, next) => {
-  //   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  //   next();
-  // });
 
   router.get(
     '/',
@@ -244,10 +207,6 @@ const createUserRoute = (
           const querry = {
             userId: currentUser._id,
           };
-          // const payPeriods = await PayPeriods.find(querry);
-          // const repairOrders = await RepairOrder.find(querry);
-          // const jobs = await Job.find(querry);
-          // const techs = await Tech.find(querry);
           const userData = await findAllUserModels(
             {
               PayPeriod,
