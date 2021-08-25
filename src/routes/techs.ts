@@ -1,10 +1,7 @@
 import express, { Router } from 'express';
 import mongoose from 'mongoose';
 import { UserModel, createUserModel } from '../models/userModel';
-import {
-  TechModel,
-  createTechModel,
-} from '../models/techModel';
+import { TechModel, createTechModel } from '../models/techModel';
 import MessageHelper from '../utils/messageHelper';
 
 const router = express.Router();

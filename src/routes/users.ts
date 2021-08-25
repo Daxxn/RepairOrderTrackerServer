@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import express, { Router, Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
+import mongoose, { FilterQuery } from 'mongoose';
 import MessageHelper from '../utils/messageHelper';
 import { UserModel, UserDoc, createUserModel } from '../models/userModel';
 import {
@@ -15,7 +15,7 @@ import {
   createRepairOrderModel,
   RepairOrderObjects,
 } from '../models/repairOrderModel';
-import { BaseDoc, BaseObjects } from '../utils/types';
+import { BaseDoc, BaseModel, BaseObject, BaseType } from '../utils/types';
 import DbFunctions from '../utils/dbFunctions';
 import { JobModel, createJobModel, JobObjects } from '../models/jobModel';
 import {
@@ -57,12 +57,69 @@ const messages = MessageHelper.get();
 //   return objects;
 // };
 
+const constructDict = (data: BaseDoc[]): BaseObject => {
+  const output: BaseObject = {};
+  data.forEach(item => {
+    output[item._id] = item;
+  });
+  return output;
+};
+
+type DocContainer = {
+  PayPeriod: PayPeriodModel;
+  RepairOrder: RepairOrderModel;
+  Job: JobModel;
+  Tech: TechModel;
+};
+
+const findAllUserModels = (
+  documents: DocContainer,
+  querry: any
+): Promise<
+  [PayPeriodObjects, RepairOrderObjects, JobObjects, TechObjects]
+> => {
+  return Promise.all([
+    new Promise<PayPeriodObjects>((res, rej) => {
+      documents.PayPeriod.find(querry).exec((err, result) => {
+        if (err) {
+          rej(err);
+        }
+        res(constructDict(result) as PayPeriodObjects);
+      });
+    }),
+    new Promise<RepairOrderObjects>((res, rej) => {
+      documents.RepairOrder.find(querry).exec((err, result) => {
+        if (err) {
+          rej(err);
+        }
+        res(constructDict(result) as RepairOrderObjects);
+      });
+    }),
+    new Promise<JobObjects>((res, rej) => {
+      documents.Job.find(querry).exec((err, result) => {
+        if (err) {
+          rej(err);
+        }
+        res(constructDict(result) as JobObjects);
+      });
+    }),
+    new Promise<TechObjects>((res, rej) => {
+      documents.Tech.find(querry).exec((err, result) => {
+        if (err) {
+          rej(err);
+        }
+        res(constructDict(result) as TechObjects);
+      });
+    }),
+  ]);
+};
+
 const createUserRoute = (
   db: typeof mongoose,
   config: AuthConfig
 ): Router => {
   const User: UserModel = createUserModel(db);
-  const PayPeriods: PayPeriodModel = createPayPeriodModel(db);
+  const PayPeriod: PayPeriodModel = createPayPeriodModel(db);
   const RepairOrder: RepairOrderModel = createRepairOrderModel(db);
   const Job: JobModel = createJobModel(db);
   const Tech: TechModel = createTechModel(db);
@@ -133,7 +190,7 @@ const createUserRoute = (
         console.log(Object.keys(foundUser.payPeriods));
         const payPeriods = (await DbFunctions.findByIds(
           Object.keys(foundUser.payPeriods),
-          PayPeriods
+          PayPeriod
         )) as PayPeriodObjects;
         const repairOrders = (await DbFunctions.findByIds(
           Object.keys(payPeriods),
@@ -165,21 +222,49 @@ const createUserRoute = (
       try {
         const { email } = req.body;
         if (email) {
+          let currentUser;
+          let statusCode = 0;
           const foundUser = await User.findOne({
             email: email,
           });
-          console.log(foundUser);
+
           if (!foundUser) {
             const newUser = new User({
               email: email,
             });
             await newUser.save();
             req.session.userId = newUser._id;
-            res.status(201).json(newUser);
+            currentUser = newUser;
+            statusCode = 201;
           } else {
             req.session.userId = foundUser._id;
-            res.status(200).json(foundUser);
+            currentUser = foundUser;
+            statusCode = 200;
           }
+          const querry = {
+            userId: currentUser._id,
+          };
+          // const payPeriods = await PayPeriods.find(querry);
+          // const repairOrders = await RepairOrder.find(querry);
+          // const jobs = await Job.find(querry);
+          // const techs = await Tech.find(querry);
+          const userData = await findAllUserModels(
+            {
+              PayPeriod,
+              RepairOrder,
+              Tech,
+              Job,
+            },
+            querry
+          );
+
+          res.status(statusCode).json({
+            user: currentUser,
+            payPeriods: userData[0],
+            repairOrders: userData[1],
+            jobs: userData[2],
+            techs: userData[3],
+          });
         } else {
           res.status(400).json({
             message: messages.noUserName,

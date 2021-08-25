@@ -6,7 +6,7 @@ import { PayPeriodDoc, PayPeriodModel } from '../models/payperiodModel';
 import { UserDoc } from '../models/userModel';
 import { JobDoc, JobModel } from '../models/jobModel';
 import { TechModel } from '../models/techModel';
-import { BaseModel, BaseObjects } from './types';
+import { BaseModel, BaseObject } from './types';
 
 export default class DbFunctions {
   //#region Props
@@ -50,12 +50,13 @@ export default class DbFunctions {
   static findByIds = async (
     ids: string[],
     model: BaseModel
-  ): Promise<BaseObjects> => {
-    const objects: BaseObjects = {};
+  ): Promise<BaseObject> => {
+    const objects: BaseObject = {};
     ids.forEach(async id => {
       const obj = await model.findById(id);
       objects[obj._id] = obj;
     });
+    console.log(objects);
     return objects;
   };
   //#endregion

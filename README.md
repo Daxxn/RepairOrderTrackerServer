@@ -2,7 +2,7 @@
 
 This is the database API where the connection to the front-end will be handled. Incuding the typical REST & CRUD methods, authentication, and session management.
 
-----
+---
 
 This is going to be where I try to describe what the hell im doing.
 
@@ -35,24 +35,23 @@ The basics of a database access and management system is the essentials and afte
 
 ## The Current Technology List:
 
-* React
-* Express
-* Auth0
-* Typescript
-* Mongoose
-* MongoDB
-* Atlas
-* Docker
-* Swagger
+- React
+- Express
+- Auth0
+- Typescript
+- Mongoose
+- MongoDB
+- Atlas
+- Docker
+- Swagger
 
 ##### Theres no timeline. I don't know when this will be done.
 
-----
+---
 
 # Running this thing
 
 ## Running the dev environment:
-
 
 - Pull the repository from github
 - create and set the `.env` file.
@@ -67,7 +66,7 @@ The basics of a database access and management system is the essentials and afte
 
 (WIP)
 
-### **Production Build
+### \*\*Production Build
 
 - Set the `.env` mode to `prod`
 - run `npm build`

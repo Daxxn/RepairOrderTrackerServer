@@ -16,7 +16,7 @@ const techSchema = new Schema({
   techNumber: {
     type: Number,
     required: true,
-  }
+  },
 });
 
 export type AllTechs = {

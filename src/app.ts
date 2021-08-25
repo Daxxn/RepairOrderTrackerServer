@@ -4,7 +4,11 @@ import path from 'path';
 import cors, { CorsOptions } from 'cors';
 import dotEnv from 'dotenv';
 import http from 'http';
-import session, { Session, SessionOptions, SessionData } from 'express-session';
+import session, {
+  Session,
+  SessionOptions,
+  SessionData,
+} from 'express-session';
 import mongoose from 'mongoose';
 import createApiRouter from './routes/api';
 import createAuthRoute from './routes/auth';
@@ -67,7 +71,7 @@ const localCors: CorsOptions = {
 
 app.options('/', (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-})
+});
 
 console.log(localCors);
 

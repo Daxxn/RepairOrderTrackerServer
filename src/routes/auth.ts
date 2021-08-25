@@ -32,7 +32,9 @@ const createAuthRoute = (db: typeof mongoose): Router => {
       }
       if (req.session && req.session.accessToken) {
         console.log('User has access token but needs to login.');
-        const foundUser = await User.findOne({ auth0Id: req.session.userId })
+        const foundUser = await User.findOne({
+          auth0Id: req.session.userId,
+        });
       } else {
         res.status(420).json({ message: messages.needToSetupAuth });
       }

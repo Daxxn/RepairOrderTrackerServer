@@ -11,13 +11,14 @@ import {
   PayPeriodObjects,
 } from '../models/payperiodModel';
 
-export type BaseObjects =
+export type BaseObject =
   | PayPeriodObjects
   | RepairOrderObjects
   | JobObjects
   | TechObjects;
 
 export type BaseDoc = PayPeriodDoc | RepairOrderDoc | JobDoc | TechDoc;
+export type BaseType = 'PayPeriod' | 'RepairOrder' | 'Job' | 'Tech';
 
 export type BaseModel =
   | PayPeriodModel
