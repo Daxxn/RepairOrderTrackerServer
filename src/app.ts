@@ -73,6 +73,7 @@ const localCors: CorsOptions = {
   origin: [
     'http://localhost:3000',
   ],
+  credentials: true,
 };
 
 app.options('/', (req, res, next) => {
@@ -115,7 +116,7 @@ const storeOptions: ConnectMongoOptions = {
 const sess: SessionOptions = {
   secret: config.sessionSecret,
   cookie: {
-    secure: false,
+    secure: true,
     maxAge: 10 * 60 * 60 * 1000,
   },
   resave: true,
