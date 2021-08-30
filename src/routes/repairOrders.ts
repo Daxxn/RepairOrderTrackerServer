@@ -3,8 +3,13 @@ import mongoose from 'mongoose';
 import { createUserModel, UserModel } from '../models/userModel';
 import {
   RepairOrderModel,
-  createRepairOrderModel
-} from '../models/repairorderModel';
+  createRepairOrderModel,
+  RepairOrderDoc,
+} from '../models/repairOrderModel';
+import {
+  PayPeriodModel,
+  createPayPeriodModel,
+} from '../models/payperiodModel';
 import MessageHelper from '../utils/messageHelper';
 
 const router = express.Router();
@@ -13,6 +18,7 @@ const messages = MessageHelper.get();
 const createRepairOrderRoute = (db: typeof mongoose): Router => {
   const User: UserModel = createUserModel(db);
   const RepairOrder: RepairOrderModel = createRepairOrderModel(db);
+  const PayPeriod: PayPeriodModel = createPayPeriodModel(db);
 
   router.get('/byuser/:userId', async (req, res, next) => {
     try {
@@ -40,7 +46,9 @@ const createRepairOrderRoute = (db: typeof mongoose): Router => {
           const popRO = await foundRO.populate('jobs').execPopulate();
           res.status(200).json(popRO);
         } else {
-          res.status(400).json({ message: messages.modelNotFound(foundRO)});
+          res
+            .status(400)
+            .json({ message: messages.modelNotFound(foundRO) });
         }
       } else {
         res.status(400).json({ message: messages.noId });
@@ -52,23 +60,61 @@ const createRepairOrderRoute = (db: typeof mongoose): Router => {
 
   router.post('/', async (req, res, next) => {
     try {
-      res.status(420).json({ message: messages.notImplemented });
+      const { body } = req;
+      if (body) {
+        const newRO = new RepairOrder(body);
+        await newRO.save();
+        res.status(201).json(newRO);
+      } else {
+        res.status(400).json({ message: messages.noBody });
+      }
     } catch (err) {
       next(err);
     }
   });
 
-  router.patch('/', async (req, res, next) => {
+  router.patch('/:id', async (req, res, next) => {
     try {
-      res.status(420).json({ message: messages.notImplemented });
+      const { id } = req.params;
+      const { body } = req;
+      if (id) {
+        if (body) {
+          const foundRO = await RepairOrder.findById(id);
+          if (foundRO) {
+            Object.assign(foundRO, body);
+            const updatedRO = await foundRO.save();
+            res.status(200).json(updatedRO);
+          } else {
+            res.status(400).json({
+              message: messages.modelNotFound<RepairOrderDoc>(foundRO),
+            });
+          }
+        } else {
+          res.status(400).json({ message: messages.noBody });
+        }
+      } else {
+        res.status(400).json({ message: messages.noId });
+      }
     } catch (err) {
       next(err);
     }
   });
 
-  router.delete('/', async (req, res, next) => {
+  router.delete('/:id', async (req, res, next) => {
     try {
-      res.status(420).json({ message: messages.notImplemented });
+      const { id } = req.params;
+      if (id) {
+        const foundRO = await RepairOrder.findById(id);
+        await Promise.all([
+          RepairOrder.deleteOne({ _id: foundRO._id }),
+          PayPeriod.updateOne(
+            { repairOrders: foundRO._id },
+            { $pull: { RepairOrders: foundRO._id } }
+          ),
+        ]);
+      } else {
+        res.status(400).json({ message: messages.noId });
+      }
     } catch (err) {
       next(err);
     }

@@ -1,27 +1,27 @@
-import mongoose, { Model, Schema, Document, ObjectId} from 'mongoose';
+import mongoose, { Model, Schema, Document, ObjectId } from 'mongoose';
 
 const ObjectId = mongoose.Types.ObjectId;
 
 const payPeriodSchema = new Schema({
   userId: {
     type: ObjectId,
-    ref: 'User',
+    ref: 'users',
     required: true,
   },
   startDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   endDate: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   repairOrders: [
     {
       type: ObjectId,
-      ref: 'RepairOrder'
-    }
-  ]
+      ref: 'repair-orders',
+    },
+  ],
 });
 
 export type PayPeriodObjects = {
@@ -33,10 +33,10 @@ export type AllPayPeriods = {
 };
 
 export interface PayPeriodDoc extends Document {
-  userId: typeof ObjectId,
-  startDate: Date,
-  endDate: Date,
-  repairOrders: [typeof ObjectId]
+  userId: typeof ObjectId;
+  startDate: Date;
+  endDate: Date;
+  repairOrders: [typeof ObjectId];
 }
 
 export type PayPeriodModel = Model<PayPeriodDoc>;
@@ -47,5 +47,5 @@ export type PayPeriodModel = Model<PayPeriodDoc>;
  * @returns {PayPeriodModel} the UserModel class
  */
 export function createPayPeriodModel(db: typeof mongoose): PayPeriodModel {
-  return db.model<PayPeriodDoc>('PayPeriod', payPeriodSchema);
+  return db.model<PayPeriodDoc>('pay-periods', payPeriodSchema);
 }

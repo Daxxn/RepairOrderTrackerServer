@@ -4,7 +4,7 @@ import { UserModel, createUserModel } from '../models/userModel';
 import {
   PayPeriodModel,
   PayPeriodDoc,
-  createPayPeriodModel
+  createPayPeriodModel,
 } from '../models/payperiodModel';
 import MessageHelper from '../utils/messageHelper';
 
@@ -30,7 +30,9 @@ const createPayPeriodRoute = (db: typeof mongoose): Router => {
       if (userId) {
         const foundUser = await User.findById(userId);
         if (foundUser) {
-          const foundPayPeriods = await PayPeriod.find({ userId: foundUser._id });
+          const foundPayPeriods = await PayPeriod.find({
+            userId: foundUser._id,
+          });
           console.log(foundPayPeriods);
           res.status(200).json(foundPayPeriods);
         } else {
@@ -43,14 +45,16 @@ const createPayPeriodRoute = (db: typeof mongoose): Router => {
       next(err);
     }
   });
-  
+
   router.get('/:id', async (req, res, next) => {
     try {
       const { id } = req.params;
       if (id) {
         const foundPayPeriod = await PayPeriod.findById(id);
         if (foundPayPeriod) {
-          const popPayPeriod = await foundPayPeriod.populate('repairOrders').execPopulate();
+          const popPayPeriod = await foundPayPeriod
+            .populate('repairOrders')
+            .execPopulate();
           res.status(200).json(popPayPeriod);
         } else {
           res.status(400).json({
@@ -92,13 +96,16 @@ const createPayPeriodRoute = (db: typeof mongoose): Router => {
             const updatedPayperiod = await foundPayPeriod.save();
             res.status(200).json(updatedPayperiod);
           } else {
-            res.status(400).json({ message: messages.modelNotFound<PayPeriodDoc>(foundPayPeriod) });
+            res.status(400).json({
+              message:
+                messages.modelNotFound<PayPeriodDoc>(foundPayPeriod),
+            });
           }
         } else {
           res.status(400).json({ message: messages.noBody });
         }
       } else {
-        res.status(400).json({ message: messages.noId});
+        res.status(400).json({ message: messages.noId });
       }
     } catch (err) {
       next(err);
@@ -111,10 +118,10 @@ const createPayPeriodRoute = (db: typeof mongoose): Router => {
       if (id) {
         const foundPayPeriod = await PayPeriod.findById(id);
         await Promise.all([
-          PayPeriod.deleteOne({_id: foundPayPeriod._id}),
+          PayPeriod.deleteOne({ _id: foundPayPeriod._id }),
           User.updateOne(
             { payPeriods: foundPayPeriod._id },
-            { $pull: { payPeriods: foundPayPeriod._id }}
+            { $pull: { payPeriods: foundPayPeriod._id } }
           ),
         ]);
       } else {

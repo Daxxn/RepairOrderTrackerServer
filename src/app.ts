@@ -4,25 +4,33 @@ import path from 'path';
 import cors, { CorsOptions } from 'cors';
 import dotEnv from 'dotenv';
 import http from 'http';
-import session from 'express-session';
+import session, {
+  Session,
+  SessionOptions,
+  SessionData,
+} from 'express-session';
 import mongoose from 'mongoose';
 import createApiRouter from './routes/api';
 import createAuthRoute from './routes/auth';
 import AuthConfigHelper from './utils/authCheck';
+import MongoStore from 'connect-mongo';
+import { ConnectMongoOptions } from 'connect-mongo/build/main/lib/MongoStore';
+import prettyError from './utils/prettyError';
 
 dotEnv.config();
 
-//#region Get Environment Variables
+// #region Get Environment Variables
 const config = AuthConfigHelper.buildConfig();
 //#endregion
 
 const app = express();
+app.set('env', config.env);
 app.set('use-auth', config.useAuth);
 
 app.set('views', './public/static/');
 app.set('view engine', 'pug');
 
-//#region Build Routes
+// #region Build Routes
 const buildLogoutRoute = () => {
   app.get('/logout', (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -53,15 +61,32 @@ const buildRoutes = (db: typeof mongoose) => {
 };
 //#endregion
 
-//#region Init Middleware
+// #region Init Middleware
 const localCors: CorsOptions = {
-  origin: `${config.localAppOrigin}${config.localAppPort}/`
+  allowedHeaders: [
+    'Content-Type',
+    'Access-Control-Allow-Origin',
+    'Authorization',
+  ],
+  exposedHeaders: [
+    'Set-Cookie',
+    'Content-Type'
+  ],
+  origin: ['http://localhost:3000'],
+  credentials: true,
 };
+
+app.options('/', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+});
+
+console.log(localCors);
 
 const prodCors: CorsOptions = {
   origin: config.appOrigin,
-  preflightContinue: true
+  preflightContinue: true,
 };
+
 if (config.env === 'dev') {
   app.use(cors(localCors));
 } else {
@@ -75,34 +100,63 @@ if (config.env === 'dev') {
 }
 //#endregion
 
-//#region Setup Session
-const sess = {
-  secret: config.sessionSecret,
-  cookie: {
-    secure: false
-  },
-  resave: true,
-  saveUninitialized: true
+// #region Setup Session
+declare module 'express-session' {
+  interface SessionData {
+    accessToken?: string;
+    userId?: string;
+  }
+}
+
+const storeOptions: ConnectMongoOptions = {
+  mongoUrl: process.env.DB_CONNECT,
+  dbName: 'ROTracker',
 };
 
-app.use(session(sess));
-//#endregion
+const sess: SessionOptions = {
+  secret: config.sessionSecret,
+  cookie: {
+    secure: false,
+    maxAge: 8 * 60 * 60 * 1000,
+  },
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create(storeOptions),
+};
 
-//#region Setup Auth0 Middleware
+if (app.get('env') === 'production') {
+  app.set('trust-proxy', 1);
+  sess.cookie.secure = true;
+}
+
+app.use(session(sess));
+// #endregion
+
+// #region Setup Auth0 Middleware
 if (config.useAuth == true) {
   app.use('/api', config.authCheck);
 }
-//#endregion
+// #endregion
 
+// #region Other Middleware
 app.get('/', (req: Request, res: Response) => {
-  res.status(200).sendFile('./public/static/index.html', { root: __dirname });
+  res
+    .status(200)
+    .sendFile('./public/static/index.html', { root: __dirname });
 });
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json(err);
-});
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (config.env === 'dev') {
+    res.locals.message = err.message;
+    res.locals.error = err;
 
-//#region Start Server
+    prettyError(err);
+  }
+  res.status(err.status || 500).json(err);
+});
+// #endregion
+
+// #region Start Server
 const server = http.createServer(app);
 
 const serverStartCallback = () => {
@@ -112,34 +166,29 @@ const serverStartCallback = () => {
 };
 
 const connectToDatabase = async () => {
-  if (config.dbConnection) {
+  try {
     const db = await mongoose.connect(config.dbConnection, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useFindAndModify: true
+      useFindAndModify: true,
     });
     buildRoutes(db);
-  } else {
-    throw new Error('Cannot connect to database. Check ENV file.');
+  } catch (err) {
+    prettyError(err);
   }
 };
 
 const startServer = () => {
-  if (config.port) {
-    app.set('port', config.port);
-    connectToDatabase()
-      .then(() => {
-        server.listen(config.port, () => serverStartCallback());
-      })
-      .catch(err => {
-        throw err;
-      });
-  } else {
-    throw new Error(
-      'Server start failed. Could not normalize port. Check ENV file.'
-    );
-  }
+  app.set('port', config.port);
+  connectToDatabase()
+    .then(() => {
+      console.log('Connected to database...\nstarting server...\n');
+      server.listen(config.port, () => serverStartCallback());
+    })
+    .catch(err => {
+      prettyError(err);
+    });
 };
 
 startServer();
-//#endregion
+// #endregion

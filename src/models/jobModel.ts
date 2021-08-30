@@ -1,4 +1,4 @@
-import mongoose, { Model, Schema, Document} from 'mongoose';
+import mongoose, { Model, Schema, Document } from 'mongoose';
 import { TechObjects } from './techModel';
 
 const ObjectId = mongoose.Types.ObjectId;
@@ -6,17 +6,17 @@ const ObjectId = mongoose.Types.ObjectId;
 const jobSchema = new Schema({
   userId: {
     type: String,
-    ref: 'User',
+    ref: 'users',
     required: true,
   },
   name: {
     type: String,
-    required: true
+    required: true,
   },
   description: String,
   time: Number,
   isRecall: Boolean,
-  assignedTech: ObjectId
+  assignedTech: ObjectId,
 });
 
 export type AllJobs = {
@@ -26,10 +26,10 @@ export type AllJobs = {
 
 export type JobObjects = {
   [id: string]: JobDoc;
-}
+};
 
 export interface JobDoc extends Document {
-  userId: typeof ObjectId,
+  userId: typeof ObjectId;
   name: string;
   description: string;
   time: number;
@@ -40,5 +40,5 @@ export interface JobDoc extends Document {
 export type JobModel = Model<JobDoc>;
 
 export function createJobModel(db: typeof mongoose): JobModel {
-  return db.model<JobDoc>('Job', jobSchema);
+  return db.model<JobDoc>('jobs', jobSchema);
 }

@@ -9,11 +9,11 @@ const messages = MessageHelper.get();
 /**
  * I may not need to do this. The Auth0 server will
  * take care of it??
- * @param db 
+ * @param db
  * @returns {Router} Router
  */
 const createAuthRoute = (db: typeof mongoose): Router => {
-  const Users: UserModel = createUserModel(db);
+  const User: UserModel = createUserModel(db);
 
   router.get('/', (req, res) => {
     if (process.env.USE_AUTH == 'true') {
@@ -23,14 +23,23 @@ const createAuthRoute = (db: typeof mongoose): Router => {
     }
   });
 
-  router.post('/login', (req, res) => {
-    // Need to send token to Auth0 for checking.
-    // Then need to store the user ID in the session
-    // And create a cookie for the session?? (Check what PointSpire does.)
-    if (process.env.USE_AUTH == 'true') {
-      res.status(420).json({ message: messages.notImplemented });
-    } else {
-      res.status(420).json({ message: messages.needToSetupAuth });
+  router.post('/login', async (req, res, next) => {
+    try {
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      if (req.session && req.session.userId) {
+        console.log('User already logged in.');
+        res.redirect(`api/users/${req.session.userId}`);
+      }
+      if (req.session && req.session.accessToken) {
+        console.log('User has access token but needs to login.');
+        const foundUser = await User.findOne({
+          auth0Id: req.session.userId,
+        });
+      } else {
+        res.status(420).json({ message: messages.needToSetupAuth });
+      }
+    } catch (err) {
+      next(err);
     }
   });
 
