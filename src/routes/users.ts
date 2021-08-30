@@ -25,6 +25,22 @@ import {
 const router = express.Router();
 const messages = MessageHelper.get();
 
+const getQuerry = (userId: string) => {
+  return {
+    userId,
+  };
+};
+
+const checkSession = (userId: string, req: Request): boolean => {
+  if (req.session.userId) {
+    if (req.session.userId == userId) {
+      return true;
+    }
+    return false;
+  }
+  return false;
+};
+
 const constructDict = (data: BaseDoc[]): BaseObject => {
   const output: BaseObject = {};
   data.forEach(item => {
@@ -179,61 +195,163 @@ const createUserRoute = (
     }
   });
 
-  router.post(
-    '/',
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const { email } = req.body;
-        if (email) {
-          let currentUser;
-          let statusCode = 0;
-          const foundUser = await User.findOne({
-            email: email,
-          });
-
-          if (!foundUser) {
-            const newUser = new User({
-              email: email,
-            });
-            await newUser.save();
-            req.session.userId = newUser._id;
-            currentUser = newUser;
-            statusCode = 201;
-          } else {
+  router.get('/:authId', async (req, res, next) => {
+    try {
+      const { authId } = req.params;
+      if (authId) {
+        const foundUser = await User.findOne({
+          authId,
+        });
+        if (foundUser) {
+          if (!checkSession(foundUser._id, req)) {
             req.session.userId = foundUser._id;
-            currentUser = foundUser;
-            statusCode = 200;
           }
-          const querry = {
-            userId: currentUser._id,
-          };
-          const userData = await findAllUserModels(
-            {
-              PayPeriod,
-              RepairOrder,
-              Tech,
-              Job,
-            },
-            querry
-          );
-
-          res.status(statusCode).json({
-            user: currentUser,
-            payPeriods: userData[0],
-            repairOrders: userData[1],
-            jobs: userData[2],
-            techs: userData[3],
-          });
+          res.status(200).json(foundUser);
         } else {
-          res.status(400).json({
-            message: messages.noUserName,
+          res.status(200).json({
+            message: messages.noUserFound,
           });
         }
-      } catch (err) {
-        next(err);
+      } else {
+        next(new Error('Somehow ended up here. should have been routed to a different endpoint.'));
       }
+    } catch (err) {
+      next(err);
     }
-  );
+  });
+
+  // #region OLD User POST
+  // router.post(
+  //   '/',
+  //   async (req: Request, res: Response, next: NextFunction) => {
+  //     try {
+  //       const { email } = req.body;
+  //       if (email) {
+  //         let currentUser;
+  //         let statusCode = 0;
+  //         const foundUser = await User.findOne({
+  //           email: email,
+  //         });
+
+  //         if (!foundUser) {
+  //           const newUser = new User({
+  //             email: email,
+  //           });
+  //           await newUser.save();
+  //           req.session.userId = newUser._id;
+  //           currentUser = newUser;
+  //           statusCode = 201;
+  //         } else {
+  //           req.session.userId = foundUser._id;
+  //           currentUser = foundUser;
+  //           statusCode = 200;
+  //         }
+  //         const querry = {
+  //           userId: currentUser._id,
+  //         };
+  //         const userData = await findAllUserModels(
+  //           {
+  //             PayPeriod,
+  //             RepairOrder,
+  //             Tech,
+  //             Job,
+  //           },
+  //           querry
+  //         );
+
+  //         res.status(statusCode).json({
+  //           user: currentUser,
+  //           payPeriods: userData[0],
+  //           repairOrders: userData[1],
+  //           jobs: userData[2],
+  //           techs: userData[3],
+  //         });
+  //       } else {
+  //         res.status(400).json({
+  //           message: messages.noUserName,
+  //         });
+  //       }
+  //     } catch (err) {
+  //       next(err);
+  //     }
+  //   }
+  // );
+  // #endregion
+
+  router.post('/', async (req, res, next) => {
+    try {
+      const { body } = req;
+      if (body) {
+        const foundUser = await User.find({
+          authId: body.authId,
+        });
+        if (!foundUser) {
+          if (body._id) {
+            delete body._id;
+          }
+          const newUser = new User(body);
+          const savedUser = await newUser.save();
+          res.status(201).json(savedUser);
+        } else {
+          res.status(400).json({
+            message: messages.userExists,
+          })
+        }
+      } else {
+        res.status(400).json({
+          message: messages.noBody,
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/data/:id', async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      if (req.session.userId) {
+        const foundUser = await User.findById(req.session.userId);
+        if (foundUser) {
+          // get all the data...
+        } else {
+          res.status(400).json({
+            message: messages.badSession,
+          });
+        }
+      } else {
+        if (id) {
+          const foundUser = await User.findById(req.session.userId);
+          if (foundUser) {
+            req.session.userId = foundUser._id;
+            const userData = await findAllUserModels(
+              {
+                PayPeriod,
+                RepairOrder,
+                Job,
+                Tech,
+              },
+              getQuerry(foundUser._id)
+            );
+            res.status(200).json(userData);
+          } else {
+            res.status(400).json({
+              message: messages.noUserFound,
+            });
+          }
+        } else {
+          res.status(400).json({
+            message: messages.noId,
+          });
+        }
+        res.status(400).json({
+          message: messages.noUserFound,
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
 
   router.patch(
     '/:id',

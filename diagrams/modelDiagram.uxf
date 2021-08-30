@@ -1,0 +1,120 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><element><id>UMLClass</id><coordinates><x>40</x><y>280</y><w>240</w><h>210</h></coordinates><panel_attributes>&lt;&lt;PayPeriodSchema&gt;&gt;
+models::PayPeriod
+--
+-_id: ObjectId
+-userId: {
+  type:ObjectId,
+  ref: 'users',
+  required: true
+}
+-startDate: { type: Date default: Date.now }
+-endDate: { type: Date default: Date.now }
+-repairOrders: [
+  { type: ObjectId, ref: 'repair-orders' }
+]</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>360</x><y>280</y><w>210</w><h>140</h></coordinates><panel_attributes>&lt;&lt;PayPeriodDocument&gt;&gt;
+models::payPeriod
+--
+-_id: ObjectId
+-userId: ObjectId
+-startDate: Date
+-endDate: Date
+repairOrders: ObjectId[]
+--
+/+DocumentOperations()/</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>280</x><y>120</y><w>100</w><h>30</h></coordinates><panel_attributes>/Document/
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>270</x><y>290</y><w>110</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>90;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>320</x><y>140</y><w>170</w><h>160</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>150;140;150;80;10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>320</x><y>140</y><w>170</w><h>440</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>150;420;150;340;10;340;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>360</x><y>560</y><w>210</w><h>170</h></coordinates><panel_attributes>&lt;&lt;RepairOrderDocument&gt;&gt;
+models::RepairOrder
+--
+-_id: ObjectId
+-userId: ObjectId
+-roNumber: number
+-flagId: number
+-date: Date
+-isCompleted: boolean
+-jobs: ObjectId[]
+--
+/+DocumentOperations()/</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>560</y><w>240</w><h>240</h></coordinates><panel_attributes>&lt;&lt;RepairOrderSchema&gt;&gt;
+models::RepairOrder
+--
+-_id: ObjectId
+-userId: {
+  type:ObjectId,
+  ref: 'users',
+  required: true
+}
+-roNumber: Number
+-flagId: Number
+-date: { type: Date default: Date.now }
+-isCompleted: Boolean
+-jobs: [
+  { type: ObjectId, ref: 'jobs' }
+]</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>270</x><y>570</y><w>110</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>90;10;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>820</y><w>240</w><h>210</h></coordinates><panel_attributes>&lt;&lt;JobSchema&gt;&gt;
+models::Job
+--
+-_id: ObjectId
+-userId: {
+  type:ObjectId,
+  ref: 'users',
+  required: true
+}
+-name: String
+-description: String
+-time: Number
+-isRecall: Boolean
+-assignedTech: ObjectId</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>360</x><y>820</y><w>210</w><h>170</h></coordinates><panel_attributes>&lt;&lt;JobDocument&gt;&gt;
+models::Job
+--
+-_id: ObjectId
+-userId: ObjectId
+-name: string
+-description: string
+-time: number
+-isRecall: boolean
+-assignedTech: ObjectId
+--
+/+DocumentOperations()/</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>270</x><y>830</y><w>110</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>90;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>320</x><y>140</y><w>170</w><h>700</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>150;680;150;640;10;640;10;10</additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>1050</y><w>240</w><h>170</h></coordinates><panel_attributes>&lt;&lt;TechSchema&gt;&gt;
+models::Tech
+--
+-_id: ObjectId
+-userId: {
+  type:ObjectId,
+  ref: 'users',
+  required: true
+}
+-name: { type: String, required: true }
+-techNumber: { type: Number, required: true }</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>360</x><y>1050</y><w>210</w><h>120</h></coordinates><panel_attributes>&lt;&lt;JobDocument&gt;&gt;
+models::Tech
+--
+-_id: ObjectId
+-userId: ObjectId
+-name: string
+-techNumber: number
+--
+/+DocumentOperations()/</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>670</x><y>0</y><w>210</w><h>200</h></coordinates><panel_attributes>&lt;&lt;UserSchema&gt;&gt;
+models::User
+--
+-id: ObjectId
+-userName: { type: String, required: true }
+-email: { type: String, required: true }
+-firstName: String
+-lastName: String
+-dateCreated: { type: Date, default: Date.now }
+-isAdmin: Boolean
+-payPeriods: [
+  { type: ObjectId, ref: 'pay-periods' }
+]</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>670</x><y>270</y><w>210</w><h>180</h></coordinates><panel_attributes>&lt;&lt;UserDocument&gt;&gt;
+models::user
+--
+-_id: ObjectId
+-userName: string
+-email: string
+-firstName: string
+-lastname: string
+-dateCreated: Date
+-isAdmin: boolean
+payPeriods: ObjectId[]
+--
+/+DocumentOperations()/</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>770</x><y>190</y><w>30</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>320</x><y>140</y><w>370</w><h>170</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>350;150;330;150;330;80;10;80;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>270</x><y>1060</y><w>110</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;-</panel_attributes><additional_attributes>90;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>320</x><y>140</y><w>170</w><h>930</h></coordinates><panel_attributes>lt=&lt;&lt;.</panel_attributes><additional_attributes>150;910;150;880;10;880;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>285</y><w>130</w><h>170</h></coordinates><panel_attributes>lt=&lt;-
+m1=0..n</panel_attributes><additional_attributes>110;140;70;140;70;10;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>375</y><w>70</w><h>220</h></coordinates><panel_attributes>lt=&lt;-
+m1=0..n</panel_attributes><additional_attributes>10;10;50;10;50;200;10;200</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>685</y><w>70</w><h>170</h></coordinates><panel_attributes>lt=&lt;-
+m1=0..n</panel_attributes><additional_attributes>10;10;50;10;50;150;10;150</additional_attributes></element><element><id>Relation</id><coordinates><x>560</x><y>945</y><w>70</w><h>140</h></coordinates><panel_attributes>lt=&lt;-
+m1=0..1</panel_attributes><additional_attributes>10;10;50;10;50;120;10;120</additional_attributes></element></diagram>

@@ -15,7 +15,7 @@ import createAuthRoute from './routes/auth';
 import AuthConfigHelper from './utils/authCheck';
 import MongoStore from 'connect-mongo';
 import { ConnectMongoOptions } from 'connect-mongo/build/main/lib/MongoStore';
-import createSessionTestRoute from './routes/sessionTest';
+import prettyError from './utils/prettyError';
 
 dotEnv.config();
 
@@ -56,9 +56,6 @@ const buildLogoutRoute = () => {
 const buildRoutes = (db: typeof mongoose) => {
   app.use('/api', createApiRouter(db, config));
   app.use('/auth', createAuthRoute(db));
-  if (config.env === 'dev') {
-    app.use('/session', createSessionTestRoute(db));
-  }
   buildLogoutRoute();
 };
 //#endregion
@@ -70,9 +67,11 @@ const localCors: CorsOptions = {
     'Access-Control-Allow-Origin',
     'Authorization',
   ],
-  origin: [
-    'http://localhost:3000',
+  exposedHeaders: [
+    'Set-Cookie',
+    'Content-Type'
   ],
+  origin: ['http://localhost:3000'],
   credentials: true,
 };
 
@@ -116,11 +115,11 @@ const storeOptions: ConnectMongoOptions = {
 const sess: SessionOptions = {
   secret: config.sessionSecret,
   cookie: {
-    secure: true,
-    maxAge: 10 * 60 * 60 * 1000,
+    secure: false,
+    maxAge: 8 * 60 * 60 * 1000,
   },
-  resave: true,
-  saveUninitialized: true,
+  resave: false,
+  saveUninitialized: false,
   store: MongoStore.create(storeOptions),
 };
 
@@ -160,33 +159,28 @@ const serverStartCallback = () => {
 };
 
 const connectToDatabase = async () => {
-  if (config.dbConnection) {
+  try {
     const db = await mongoose.connect(config.dbConnection, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: true,
     });
     buildRoutes(db);
-  } else {
-    throw new Error('Cannot connect to database. Check ENV file.');
+  } catch (err) {
+    prettyError(err);
   }
 };
 
 const startServer = () => {
-  if (config.port) {
-    app.set('port', config.port);
-    connectToDatabase()
-      .then(() => {
-        server.listen(config.port, () => serverStartCallback());
-      })
-      .catch(err => {
-        throw err;
-      });
-  } else {
-    throw new Error(
-      'Server start failed. Could not normalize port. Check ENV file.'
-    );
-  }
+  app.set('port', config.port);
+  connectToDatabase()
+    .then(() => {
+      console.log('Connected to database...\nstarting server...\n');
+      server.listen(config.port, () => serverStartCallback());
+    })
+    .catch(err => {
+      prettyError(err);
+    });
 };
 
 startServer();

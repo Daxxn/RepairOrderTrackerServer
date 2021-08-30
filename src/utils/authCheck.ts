@@ -25,29 +25,36 @@ export interface AuthConfig {
 export default class AuthConfigHelper {
   static auth: AuthConfig;
   private static buildAuth() {
-    if (process.env.AUTH0_AUDIENCE && process.env.AUTH0_ISSUER) {
-      if (process.env.APP_ORIGIN || process.env.LOCAL_APP_ORIGIN) {
-        this.auth = {
-          port: this.normalizePort(),
-          env: this.normalizeEnvOption(),
-          useAuth: process.env.USE_AUTH == 'true' ? true : false,
-          audience: process.env.AUTH0_AUDIENCE,
-          issuer: process.env.AUTH0_ISSUER,
-          algorythm: process.env.AUTH0_ALGORYTHM,
-          dbConnection: process.env.DB_CONNECT,
-          sessionSecret: process.env.SESSION_SECRET,
-          appOrigin: process.env.APP_ORIGIN,
-          localAppOrigin: process.env.LOCAL_APP_ORIGIN,
-          localAppPort: process.env.LOCAL_APP_PORT,
-        };
-        return;
+    this.auth = {
+      port: this.normalizePort(),
+      env: this.normalizeEnvOption(),
+      useAuth: process.env.USE_AUTH == 'true' ? true : false,
+      audience: process.env.AUTH0_AUDIENCE,
+      issuer: process.env.AUTH0_ISSUER,
+      algorythm: process.env.AUTH0_ALGORYTHM,
+      dbConnection: process.env.DB_CONNECT,
+      sessionSecret: process.env.SESSION_SECRET,
+      appOrigin: process.env.APP_ORIGIN,
+      localAppOrigin: process.env.LOCAL_APP_ORIGIN,
+      localAppPort: process.env.LOCAL_APP_PORT,
+    };
+    this.checkVariables();
+  }
+
+  private static checkVariables = () => {
+    let badVars: string[] = [];
+    const props = Object.entries(AuthConfigHelper.auth);
+    for (let i = 0; i < props.length; i++) {
+      if (props[i][1] === undefined) {
+        badVars.push(props[i][0]);
       }
+    }
+    if (badVars.length > 0) {
       throw new Error(
-        'Cannot find app origin. An origin needs to be specified. Check ENV file.'
+        `Some Env variables are missing!!\n\n${badVars.join(',\n')}\n`
       );
     }
-    throw new Error('Cannot authorize. Check ENV file.');
-  }
+  };
 
   private static normalizePort(): number {
     const port = Number.parseInt(process.env.PORT);
