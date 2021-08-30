@@ -24,6 +24,7 @@ const config = AuthConfigHelper.buildConfig();
 //#endregion
 
 const app = express();
+app.set('env', config.env);
 app.set('use-auth', config.useAuth);
 
 app.set('views', './public/static/');
@@ -144,8 +145,14 @@ app.get('/', (req: Request, res: Response) => {
     .sendFile('./public/static/index.html', { root: __dirname });
 });
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json(err);
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (config.env === 'dev') {
+    res.locals.message = err.message;
+    res.locals.error = err;
+
+    prettyError(err);
+  }
+  res.status(err.status || 500).json(err);
 });
 // #endregion
 

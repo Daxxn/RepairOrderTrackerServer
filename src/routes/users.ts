@@ -195,12 +195,12 @@ const createUserRoute = (
     }
   });
 
-  router.get('/:authId', async (req, res, next) => {
+  router.get('/auth-id/:authId', async (req, res, next) => {
     try {
       const { authId } = req.params;
       if (authId) {
         const foundUser = await User.findOne({
-          authId,
+          authId: authId,
         });
         if (foundUser) {
           if (!checkSession(foundUser._id, req)) {
@@ -307,8 +307,51 @@ const createUserRoute = (
     }
   });
 
+  router.post('/data', async (req, res, next) => {
+    try {
+      console.log('Made it to the data request');
+      if (req.session.userId) {
+        const foundUser = await User.findById(req.session.userId);
+        if (foundUser) {
+          const userData = await findAllUserModels(
+            {
+              PayPeriod,
+              RepairOrder,
+              Job,
+              Tech,
+            },
+            getQuerry(foundUser._id)
+          );
+          console.log({
+            PayPeriods: userData[0],
+            RepairOrders: userData[1],
+            Jobs: userData[2],
+            Techs: userData[3],
+          });
+          res.status(200).json({
+            PayPeriods: userData[0],
+            RepairOrders: userData[1],
+            Jobs: userData[2],
+            Techs: userData[3],
+          });
+        } else {
+          res.status(400).json({
+            message: messages.badSession,
+          });
+        }
+      } else {
+        res.status(400).json({
+          message: messages.badSession,
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
   router.post('/data/:id', async (req, res, next) => {
     try {
+      console.log('Made it to the data request');
       const { id } = req.params;
       if (req.session.userId) {
         const foundUser = await User.findById(req.session.userId);
@@ -333,7 +376,12 @@ const createUserRoute = (
               },
               getQuerry(foundUser._id)
             );
-            res.status(200).json(userData);
+            res.status(200).json({
+              PayPeriods: userData[0],
+              RepairOrders: userData[1],
+              Jobs: userData[2],
+              Techs: userData[3],
+            });
           } else {
             res.status(400).json({
               message: messages.noUserFound,
