@@ -251,7 +251,6 @@ const createUserRoute = (
             },
             DbFunctions.getQuerry(foundUser._id)
           );
-          console.log(userData[2]);
           res.status(200).json({
             PayPeriods: userData[0],
             RepairOrders: userData[1],
@@ -299,7 +298,6 @@ const createUserRoute = (
               },
               DbFunctions.getQuerry(foundUser._id)
             );
-            console.log(userData[2]);
             res.status(200).json({
               PayPeriods: userData[0],
               RepairOrders: userData[1],

@@ -58,20 +58,50 @@ const createRepairOrderRoute = (db: typeof mongoose): Router => {
     }
   });
 
-  router.post('/', async (req, res, next) => {
+  // #region POST Gen 1
+  // router.post('/', async (req, res, next) => {
+  //   try {
+  //     const { body } = req;
+  //     if (body) {
+  //       const newRO = new RepairOrder(body);
+  //       await newRO.save();
+  //       res.status(201).json(newRO);
+  //     } else {
+  //       res.status(400).json({ message: messages.noBody });
+  //     }
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // });
+  // #endregion
+
+  //#region POST Gen 2
+  router.post('/:parentId', async (req, res, next) => {
     try {
-      const { body } = req;
-      if (body) {
-        const newRO = new RepairOrder(body);
-        await newRO.save();
-        res.status(201).json(newRO);
+      if (req.session.userId) {
+        const { userId } = req.session;
+        const { parentId } = req.params;
+        const foundUser = await User.findById(userId);
+        if (foundUser) {
+          const newRO = new RepairOrder({
+            userId,
+          });
+          const payPeriod = await PayPeriod.findById(parentId);
+          const savedRO = await newRO.save();
+          payPeriod.repairOrders.push(savedRO._id);
+          await payPeriod.save();
+          res.status(201).json(savedRO);
+        } else {
+          res.status(400).json({ message: messages.badSession });
+        }
       } else {
-        res.status(400).json({ message: messages.noBody });
+        res.status(400).json({ message: messages.badSession });
       }
     } catch (err) {
       next(err);
     }
   });
+  //#endregion
 
   router.patch('/:id', async (req, res, next) => {
     try {
