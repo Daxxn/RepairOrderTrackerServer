@@ -11,19 +11,19 @@ on:
 
 jobs:
   build:
-    environment: build-test-env
+    # environment: build-test-env
     env:
-      PORT: ${{ build-test-env.secret.PORT }}
-      MODE: ${{ build-test-env.secret.MODE }}
-      USE_AUTH: ${{ build-test-env.secret.USE_AUTH }}
-      APP_ORIGIN: ${{ build-test-env.secret.APP_ORIGIN }}
-      LOCAL_APP_ORIGIN: ${{ build-test-env.secret.LOCAL_APP_ORIGIN }}
-      LOCAL_APP_PORT: ${{ build-test-env.secret.LOCAL_APP_PORT }}
-      AUTH0_AUDIENCE: ${{ build-test-env.secret.AUTH0_AUDIENCE }}
-      AUTH0_ISSUER: ${{ build-test-env.secret.AUTH0_ISSUER }}
-      AUTH0_ALGORYTHM: ${{ build-test-env.secret.AUTH0_ALGORYTHM }}
-      DB_CONNECT: ${{ build-test-env.secret.DB_CONNECT }}
-      SESSION_SECRET: ${{ build-test-env.secret.SESSION_SECRET }}
+      PORT: ${{ secret.PORT }}
+      MODE: ${{ secret.MODE }}
+      USE_AUTH: ${{ secret.USE_AUTH }}
+      APP_ORIGIN: ${{ secret.APP_ORIGIN }}
+      LOCAL_APP_ORIGIN: ${{ secret.LOCAL_APP_ORIGIN }}
+      LOCAL_APP_PORT: ${{ secret.LOCAL_APP_PORT }}
+      AUTH0_AUDIENCE: ${{ secret.AUTH0_AUDIENCE }}
+      AUTH0_ISSUER: ${{ secret.AUTH0_ISSUER }}
+      AUTH0_ALGORYTHM: ${{ secret.AUTH0_ALGORYTHM }}
+      DB_CONNECT: ${{ secret.DB_CONNECT }}
+      SESSION_SECRET: ${{ secret.SESSION_SECRET }}
     runs-on: ubuntu-latest
 
     strategy:
