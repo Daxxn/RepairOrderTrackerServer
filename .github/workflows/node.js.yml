@@ -11,9 +11,7 @@ on:
 
 jobs:
   build:
-    environment: 
-      name: build-test-env
-      url: https://github.com/Daxxn/RepairOrderTrackerServer/
+    environment: build-test-env
     runs-on: ubuntu-latest
 
     strategy:
@@ -24,6 +22,18 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
+      env:
+        PORT: ${{ secrets.PORT }}
+        MODE: ${{ secrets.MODE }}
+        USE_AUTH: ${{ secrets.USE_AUTH }}
+        APP_ORIGIN: ${{ secrets.APP_ORIGIN }}
+        LOCAL_APP_ORIGIN: ${{ secrets.LOCAL_APP_ORIGIN }}
+        LOCAL_APP_PORT: ${{ secrets.LOCAL_APP_PORT }}
+        AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+        AUTH0_ISSUER: ${{ secrets.AUTH0_ISSUER }}
+        AUTH0_ALGORYTHM: ${{ secrets.AUTH0_ALGORYTHM }}
+        DB_CONNECT: ${{ secrets.DB_CONNECT }}
+        SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
