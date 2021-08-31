@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    # environment: build-test-env
+    environment: build-test-env
     env:
       PORT: ${{ secret.PORT }}
       MODE: ${{ secret.MODE }}
