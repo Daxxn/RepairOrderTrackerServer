@@ -1,5 +1,5 @@
 import assert from 'assert';
-import simpleTest from './simpleRequest';
+// import simpleTest from './simpleRequest';
 
 describe('Array', () => {
   describe('#indexOf()', () => {
@@ -7,5 +7,5 @@ describe('Array', () => {
       assert.equal([1, 2, 3].indexOf(4), -1);
     });
   });
-  describe('Request testing', () => simpleTest);
+  // describe('Request testing', () => simpleTest);
 });
