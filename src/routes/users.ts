@@ -13,7 +13,6 @@ import {
   createRepairOrderModel,
   RepairOrderObjects,
 } from '../models/repairOrderModel';
-import { BaseDoc, BaseObject } from '../utils/types';
 import DbFunctions from '../utils/dbFunctions';
 import { JobModel, createJobModel, JobObjects } from '../models/jobModel';
 import {
@@ -24,79 +23,6 @@ import {
 
 const router = express.Router();
 const messages = MessageHelper.get();
-
-const getQuerry = (userId: string) => {
-  return {
-    userId,
-  };
-};
-
-const checkSession = (userId: string, req: Request): boolean => {
-  if (req.session.userId) {
-    if (req.session.userId == userId) {
-      return true;
-    }
-    return false;
-  }
-  return false;
-};
-
-const constructDict = (data: BaseDoc[]): BaseObject => {
-  const output: BaseObject = {};
-  data.forEach(item => {
-    output[item._id] = item;
-  });
-  return output;
-};
-
-type DocContainer = {
-  PayPeriod: PayPeriodModel;
-  RepairOrder: RepairOrderModel;
-  Job: JobModel;
-  Tech: TechModel;
-};
-
-const findAllUserModels = (
-  documents: DocContainer,
-  querry: any
-): Promise<
-  [PayPeriodObjects, RepairOrderObjects, JobObjects, TechObjects]
-> => {
-  return Promise.all([
-    new Promise<PayPeriodObjects>((res, rej) => {
-      documents.PayPeriod.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as PayPeriodObjects);
-      });
-    }),
-    new Promise<RepairOrderObjects>((res, rej) => {
-      documents.RepairOrder.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as RepairOrderObjects);
-      });
-    }),
-    new Promise<JobObjects>((res, rej) => {
-      documents.Job.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as JobObjects);
-      });
-    }),
-    new Promise<TechObjects>((res, rej) => {
-      documents.Tech.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as TechObjects);
-      });
-    }),
-  ]);
-};
 
 const createUserRoute = (
   db: typeof mongoose,
@@ -203,7 +129,7 @@ const createUserRoute = (
           authId: authId,
         });
         if (foundUser) {
-          if (!checkSession(foundUser._id, req)) {
+          if (!DbFunctions.checkSession(foundUser._id, req)) {
             req.session.userId = foundUser._id;
           }
           res.status(200).json(foundUser);
@@ -213,7 +139,11 @@ const createUserRoute = (
           });
         }
       } else {
-        next(new Error('Somehow ended up here. should have been routed to a different endpoint.'));
+        next(
+          new Error(
+            'Somehow ended up here. should have been routed to a different endpoint.'
+          )
+        );
       }
     } catch (err) {
       next(err);
@@ -295,7 +225,7 @@ const createUserRoute = (
         } else {
           res.status(400).json({
             message: messages.userExists,
-          })
+          });
         }
       } else {
         res.status(400).json({
@@ -309,25 +239,19 @@ const createUserRoute = (
 
   router.post('/data', async (req, res, next) => {
     try {
-      console.log('Made it to the data request');
       if (req.session.userId) {
         const foundUser = await User.findById(req.session.userId);
         if (foundUser) {
-          const userData = await findAllUserModels(
+          const userData = await DbFunctions.findAllUserModels(
             {
               PayPeriod,
               RepairOrder,
               Job,
               Tech,
             },
-            getQuerry(foundUser._id)
+            DbFunctions.getQuerry(foundUser._id)
           );
-          console.log({
-            PayPeriods: userData[0],
-            RepairOrders: userData[1],
-            Jobs: userData[2],
-            Techs: userData[3],
-          });
+          console.log(userData[2]);
           res.status(200).json({
             PayPeriods: userData[0],
             RepairOrders: userData[1],
@@ -351,7 +275,6 @@ const createUserRoute = (
 
   router.post('/data/:id', async (req, res, next) => {
     try {
-      console.log('Made it to the data request');
       const { id } = req.params;
       if (req.session.userId) {
         const foundUser = await User.findById(req.session.userId);
@@ -367,15 +290,16 @@ const createUserRoute = (
           const foundUser = await User.findById(req.session.userId);
           if (foundUser) {
             req.session.userId = foundUser._id;
-            const userData = await findAllUserModels(
+            const userData = await DbFunctions.findAllUserModels(
               {
                 PayPeriod,
                 RepairOrder,
                 Job,
                 Tech,
               },
-              getQuerry(foundUser._id)
+              DbFunctions.getQuerry(foundUser._id)
             );
+            console.log(userData[2]);
             res.status(200).json({
               PayPeriods: userData[0],
               RepairOrders: userData[1],

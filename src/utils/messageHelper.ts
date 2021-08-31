@@ -10,6 +10,7 @@ export default interface MessageHelper {
   adminOnlyForUsers: string;
   noAuthToken: string;
   badSession: string;
+  tooManyModels: string;
   modelNotFound: <T>(model: T) => string;
 }
 
@@ -25,7 +26,10 @@ export default class MessageHelper {
     needToSetupAuth: 'Auth is disabled. WIP.',
     adminOnlyForUsers: 'Only admins can access all users.',
     noAuthToken: 'No authorization token was found.',
-    badSession: 'Either the session expired or the userId was corrupted, session user id not found.',
+    badSession:
+      'Either the session expired or the userId was corrupted, session user id not found.',
+    tooManyModels:
+      'Too many models to save at one time. Split the models into multiple requests.',
     modelNotFound: <T>(model: T) => {
       return `Model not found in database: ${typeof model}`;
     },

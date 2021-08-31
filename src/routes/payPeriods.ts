@@ -69,20 +69,46 @@ const createPayPeriodRoute = (db: typeof mongoose): Router => {
     }
   });
 
+  //#region POST Gen 1
+  // router.post('/', async (req, res, next) => {
+  //   try {
+  //     const { body } = req;
+  //     if (body) {
+  //       const newPayPeriod = new PayPeriod(body);
+  //       await newPayPeriod.save();
+  //       res.status(201).json(newPayPeriod);
+  //     } else {
+  //       res.status(400).json({ message: messages.noBody });
+  //     }
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // });
+  //#endregion
+
+  //#region POST Gen 2
   router.post('/', async (req, res, next) => {
     try {
-      const { body } = req;
-      if (body) {
-        const newPayPeriod = new PayPeriod(body);
-        await newPayPeriod.save();
-        res.status(201).json(newPayPeriod);
+      if (req.session.userId) {
+        const { userId } = req.session;
+        const user = await User.findById(userId);
+        const newPayPeriod = new PayPeriod({
+          userId,
+        });
+        const savedPayPeriod = await newPayPeriod.save();
+        if (!user.payPeriods.includes(savedPayPeriod._id)) {
+          user.payPeriods.push(savedPayPeriod._id);
+        }
+        const savedUser = await user.save();
+        res.status(201).json(savedUser);
       } else {
-        res.status(400).json({ message: messages.noBody });
+        res.status(400).json({ message: messages.badSession });
       }
     } catch (err) {
       next(err);
     }
   });
+  //#endregion
 
   router.patch('/:id', async (req, res, next) => {
     try {

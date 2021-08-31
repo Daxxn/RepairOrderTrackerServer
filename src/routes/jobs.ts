@@ -1,12 +1,13 @@
 import express, { Router } from 'express';
 import mongoose from 'mongoose';
 import MessageHelper from '../utils/messageHelper';
-import { JobModel, createJobModel } from '../models/jobModel';
+import { JobModel, createJobModel, JobDoc } from '../models/jobModel';
 import { UserModel, createUserModel } from '../models/userModel';
 import {
   RepairOrderModel,
   createRepairOrderModel,
 } from '../models/repairOrderModel';
+import DbFunctions from '../utils/dbFunctions';
 
 const router = express.Router();
 const messages = MessageHelper.get();
@@ -74,23 +75,92 @@ const createJobRoute = (db: typeof mongoose): Router => {
     }
   });
 
-  router.post('/', async (req, res, next) => {
+  //#region POST Gen 1
+  // router.post('/', async (req, res, next) => {
+  //   try {
+  //     const { body } = req;
+  //     if (body) {
+  //       if (body._id) {
+  //         delete body._id;
+  //       }
+  //       const newTech = new Job(body);
+  //       const savedTech = await newTech.save();
+  //       res.status(201).json(savedTech);
+  //     } else {
+  //       res.status(400).json({ message: messages.noBody });
+  //     }
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // });
+  //#endregion
+
+  //#region POST Gen 2
+  router.post('/:id', async (req, res, next) => {
     try {
-      const { body } = req;
-      if (body) {
-        if (body._id) {
-          delete body._id;
-        }
-        const newTech = new Job(body);
-        const savedTech = await newTech.save();
-        res.status(201).json(savedTech);
+      if (req.session.userId) {
+        const { userId } = req.session;
+        const { id } = req.params;
+        const ro = await RepairOrder.findById(id);
+        const newJob = new Job({
+          userId,
+          name: 'Test',
+          description: 'remove at a later time.',
+          time: 100,
+        });
+        const savedJob = await newJob.save();
+        ro.jobs.push(savedJob._id);
+        await ro.save();
+        res.status(201).json(savedJob);
       } else {
-        res.status(400).json({ message: messages.noBody });
+        res.status(400).json({ message: messages.badSession });
       }
     } catch (err) {
       next(err);
     }
   });
+
+  /**
+   * EXPERIMENTAL::Saves many jobs at one time.
+   * Body:
+   *   [
+   *     {JobModel},
+   *   ]
+   */
+  router.post('/many/:id', async (req, res, next) => {
+    try {
+      if (req.session.userId) {
+        const { userId } = req.session;
+        const { id } = req.params;
+        const { jobs } = req.body;
+        if (jobs) {
+          if (jobs.length <= 50 && jobs.length > 0) {
+            const parentRO = await RepairOrder.findById(id);
+            if (parentRO) {
+              const savedJobs = await DbFunctions.createManyJobs(
+                jobs,
+                Job,
+                parentRO
+              );
+              res.status(201).json(savedJobs);
+            } else {
+              res
+                .status(400)
+                .json({ message: messages.modelNotFound('Repair Order') });
+            }
+          } else {
+            res.status(400).json({ message: messages.tooManyModels });
+          }
+        } else {
+          res.status(400).json({ message: messages.noBody });
+        }
+      } else {
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+  //#endregion
 
   router.patch('/:id', async (req, res, next) => {
     try {
