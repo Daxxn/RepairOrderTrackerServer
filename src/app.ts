@@ -15,6 +15,7 @@ import createAuthRoute from './routes/auth';
 import AuthConfigHelper from './utils/authCheck';
 import MongoStore from 'connect-mongo';
 import { ConnectMongoOptions } from 'connect-mongo/build/main/lib/MongoStore';
+import prettyError from './utils/prettyError';
 
 dotEnv.config();
 
@@ -23,6 +24,7 @@ const config = AuthConfigHelper.buildConfig();
 //#endregion
 
 const app = express();
+app.set('env', config.env);
 app.set('use-auth', config.useAuth);
 
 app.set('views', './public/static/');
@@ -66,7 +68,12 @@ const localCors: CorsOptions = {
     'Access-Control-Allow-Origin',
     'Authorization',
   ],
-  origin: `http://localhost:3000`,
+  exposedHeaders: [
+    'Set-Cookie',
+    'Content-Type'
+  ],
+  origin: ['http://localhost:3000'],
+  credentials: true,
 };
 
 app.options('/', (req, res, next) => {
@@ -110,9 +117,10 @@ const sess: SessionOptions = {
   secret: config.sessionSecret,
   cookie: {
     secure: false,
+    maxAge: 8 * 60 * 60 * 1000,
   },
-  resave: true,
-  saveUninitialized: true,
+  resave: false,
+  saveUninitialized: false,
   store: MongoStore.create(storeOptions),
 };
 
@@ -130,15 +138,23 @@ if (config.useAuth == true) {
 }
 // #endregion
 
+// #region Other Middleware
 app.get('/', (req: Request, res: Response) => {
   res
     .status(200)
     .sendFile('./public/static/index.html', { root: __dirname });
 });
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  res.status(500).json(err);
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  if (config.env === 'dev') {
+    res.locals.message = err.message;
+    res.locals.error = err;
+
+    prettyError(err);
+  }
+  res.status(err.status || 500).json(err);
 });
+// #endregion
 
 // #region Start Server
 const server = http.createServer(app);
@@ -150,33 +166,28 @@ const serverStartCallback = () => {
 };
 
 const connectToDatabase = async () => {
-  if (config.dbConnection) {
+  try {
     const db = await mongoose.connect(config.dbConnection, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useFindAndModify: true,
     });
     buildRoutes(db);
-  } else {
-    throw new Error('Cannot connect to database. Check ENV file.');
+  } catch (err) {
+    prettyError(err);
   }
 };
 
 const startServer = () => {
-  if (config.port) {
-    app.set('port', config.port);
-    connectToDatabase()
-      .then(() => {
-        server.listen(config.port, () => serverStartCallback());
-      })
-      .catch(err => {
-        throw err;
-      });
-  } else {
-    throw new Error(
-      'Server start failed. Could not normalize port. Check ENV file.'
-    );
-  }
+  app.set('port', config.port);
+  connectToDatabase()
+    .then(() => {
+      console.log('Connected to database...\nstarting server...\n');
+      server.listen(config.port, () => serverStartCallback());
+    })
+    .catch(err => {
+      prettyError(err);
+    });
 };
 
 startServer();

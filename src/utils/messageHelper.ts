@@ -2,13 +2,15 @@ export default interface MessageHelper {
   notImplemented: string;
   needToSetupAuth: string;
   noBody: string;
-  userNameExists: string;
+  userExists: string;
   noUserName: string;
   noUserFound: string;
   userDeleted: string;
   noId: string;
   adminOnlyForUsers: string;
   noAuthToken: string;
+  badSession: string;
+  tooManyModels: string;
   modelNotFound: <T>(model: T) => string;
 }
 
@@ -19,11 +21,15 @@ export default class MessageHelper {
     noUserFound: 'No user with that username found.',
     noId: 'No id was provided.',
     noUserName: 'Could not create user. userName must be provided.',
-    userNameExists: 'This UserName already exists.',
+    userExists: 'This User already exists.',
     userDeleted: 'user sucessfully deleted.',
     needToSetupAuth: 'Auth is disabled. WIP.',
     adminOnlyForUsers: 'Only admins can access all users.',
     noAuthToken: 'No authorization token was found.',
+    badSession:
+      'Either the session expired or the userId was corrupted, session user id not found.',
+    tooManyModels:
+      'Too many models to save at one time. Split the models into multiple requests.',
     modelNotFound: <T>(model: T) => {
       return `Model not found in database: ${typeof model}`;
     },

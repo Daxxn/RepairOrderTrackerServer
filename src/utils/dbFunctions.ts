@@ -1,12 +1,25 @@
+import { Request } from 'express';
 import {
   RepairOrderDoc,
   RepairOrderModel,
+  RepairOrderObjects,
 } from '../models/repairOrderModel';
-import { PayPeriodDoc, PayPeriodModel } from '../models/payperiodModel';
+import {
+  PayPeriodDoc,
+  PayPeriodModel,
+  PayPeriodObjects,
+} from '../models/payperiodModel';
 import { UserDoc } from '../models/userModel';
-import { JobDoc, JobModel } from '../models/jobModel';
-import { TechModel } from '../models/techModel';
-import { BaseModel, BaseObject } from './types';
+import { JobDoc, JobModel, JobObjects } from '../models/jobModel';
+import { TechModel, TechObjects } from '../models/techModel';
+import { BaseDoc, BaseModel, BaseObject } from './types';
+
+export type DocContainer = {
+  PayPeriod: PayPeriodModel;
+  RepairOrder: RepairOrderModel;
+  Job: JobModel;
+  Tech: TechModel;
+};
 
 export default class DbFunctions {
   //#region Props
@@ -59,5 +72,92 @@ export default class DbFunctions {
     console.log(objects);
     return objects;
   };
+
+  static getQuerry = (userId: string) => {
+    return {
+      userId,
+    };
+  };
+
+  static checkSession = (userId: string, req: Request): boolean => {
+    if (req.session.userId) {
+      if (req.session.userId == userId) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  };
+
+  static constructDict = (data: BaseDoc[]): BaseObject => {
+    const output: BaseObject = {};
+    data.forEach(item => {
+      output[item._id] = item;
+    });
+    console.log(output);
+    return output;
+  };
+
+  static findAllUserModels = (
+    documents: DocContainer,
+    querry: any
+  ): Promise<
+    [PayPeriodObjects, RepairOrderObjects, JobObjects, TechObjects]
+  > => {
+    return Promise.all([
+      new Promise<PayPeriodObjects>((res, rej) => {
+        documents.PayPeriod.find(querry).exec((err, result) => {
+          if (err) {
+            rej(err);
+          }
+          res(DbFunctions.constructDict(result) as PayPeriodObjects);
+        });
+      }),
+      new Promise<RepairOrderObjects>((res, rej) => {
+        documents.RepairOrder.find(querry).exec((err, result) => {
+          if (err) {
+            rej(err);
+          }
+          res(DbFunctions.constructDict(result) as RepairOrderObjects);
+        });
+      }),
+      new Promise<JobObjects>((res, rej) => {
+        documents.Job.find(querry).exec((err, result) => {
+          if (err) {
+            rej(err);
+          }
+          res(DbFunctions.constructDict(result) as JobObjects);
+        });
+      }),
+      new Promise<TechObjects>((res, rej) => {
+        documents.Tech.find(querry).exec((err, result) => {
+          if (err) {
+            rej(err);
+          }
+          res(DbFunctions.constructDict(result) as TechObjects);
+        });
+      }),
+    ]);
+  };
+
+  static createManyJobs(
+    jobs: any[],
+    Job: JobModel,
+    parent: RepairOrderDoc
+  ): Promise<JobDoc[]> {
+    const promises = jobs.map(job => {
+      return new Promise<JobDoc>((res, rej) => {
+        const newJob = new Job(job);
+        newJob
+          .save()
+          .then(savedJob => {
+            parent.jobs.push(savedJob._id);
+            res(savedJob);
+          })
+          .catch(err => rej(err));
+      });
+    });
+    return Promise.all(promises);
+  }
   //#endregion
 }

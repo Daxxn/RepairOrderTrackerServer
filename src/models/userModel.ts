@@ -14,6 +14,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  authId: {
+    type: String,
+    required: true,
+  },
   firstName: String,
   lastName: String,
   dateCreated: { type: Date, default: Date.now },
@@ -36,6 +40,7 @@ export type UserData = {
 export interface UserDoc extends Document {
   userName: string;
   email: string;
+  authId: string;
   firstName: string;
   lastName: string;
   dateCreated: Date;

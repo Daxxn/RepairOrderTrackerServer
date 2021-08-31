@@ -1,0 +1,109 @@
+<diagram program="umletino" version="14.4.0-SNAPSHOT"><zoom_level>10</zoom_level><help_text></help_text><element><id>Relation</id><coordinates><x>210</x><y>20</y><w>30</w><h>510</h></coordinates><panel_attributes>lt=.
+group=1</panel_attributes><additional_attributes>10;10;10;490</additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>170</x><y>0</y><w>100</w><h>30</h></coordinates><panel_attributes>_Client_
+group=1</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>520</x><y>20</y><w>30</w><h>510</h></coordinates><panel_attributes>lt=.
+group=2</panel_attributes><additional_attributes>10;10;10;490</additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>480</x><y>0</y><w>100</w><h>30</h></coordinates><panel_attributes>_Server_
+group=2</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>730</x><y>80</y><w>140</w><h>20</h></coordinates><panel_attributes>? - If statement = TRUE
+halign=left
+valign=top
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>730</x><y>100</y><w>140</w><h>20</h></coordinates><panel_attributes>?! - If statement = FALSE
+halign=left
+valign=top
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>720</x><y>180</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;-
+group=3</panel_attributes><additional_attributes>10;10;40;10</additional_attributes></element><element><id>Text</id><coordinates><x>760</x><y>180</y><w>140</w><h>20</h></coordinates><panel_attributes>Async Request
+halign=left
+valign=top
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>760</x><y>200</y><w>140</w><h>20</h></coordinates><panel_attributes>Async Response
+halign=left
+valign=top
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>720</x><y>200</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;-
+group=3</panel_attributes><additional_attributes>10;10;40;10</additional_attributes></element><element><id>Relation</id><coordinates><x>720</x><y>160</y><w>60</w><h>30</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+group=3</panel_attributes><additional_attributes>10;10;40;10</additional_attributes></element><element><id>Text</id><coordinates><x>760</x><y>160</y><w>140</w><h>20</h></coordinates><panel_attributes>IF Statement Operation
+halign=left
+valign=top
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>730</x><y>260</y><w>50</w><h>40</h></coordinates><panel_attributes>Op
+bg=blue
+style=wordwrap
+halign=center
+valign=top
+layer=1
+transparency=0
+
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>780</x><y>270</y><w>140</w><h>20</h></coordinates><panel_attributes>Internal Operation Block
+halign=left
+valign=top
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLFrame</id><coordinates><x>720</x><y>30</y><w>200</w><h>280</h></coordinates><panel_attributes>Legend
+--
+If Statements
+--
+
+
+
+
+Request Arrows
+--
+
+
+
+
+
+Other
+--
+
+transparency=80
+layer=-1
+bg=#8888ff
+fg=#aaaaaa
+group=3</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>240</x><y>60</y><w>280</w><h>50</h></coordinates><panel_attributes>lt=&lt;-
+r2=Request New Model
+m2=POST -/&lt;model&gt;/</panel_attributes><additional_attributes>260;20;10;20</additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>500</x><y>80</y><w>60</w><h>60</h></coordinates><panel_attributes>Check AccessToken
+style=wordwrap
+layer=10
+bg=blue
+transparency=0</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>360</x><y>120</y><w>160</w><h>100</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+r2=accessToken Match !?</panel_attributes><additional_attributes>140;80;110;80;110;20;140;20</additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>500</x><y>310</y><w>60</w><h>70</h></coordinates><panel_attributes>Save New Model
+style=wordwrap
+layer=10
+bg=blue
+transparency=0</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>550</x><y>120</y><w>160</w><h>210</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;-
+r2=? accessToken Match</panel_attributes><additional_attributes>10;190;40;190;40;20;10;20</additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>500</x><y>200</y><w>60</w><h>60</h></coordinates><panel_attributes>Error: Not Auth
+style=wordwrap
+layer=10
+bg=blue
+transparency=0</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>240</x><y>240</y><w>280</w><h>50</h></coordinates><panel_attributes>lt=&lt;&lt;-
+r2=401 - Not Auth
+m2=ErrorResponse</panel_attributes><additional_attributes>10;20;260;20</additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>180</x><y>260</y><w>70</w><h>60</h></coordinates><panel_attributes>Handle Not Auth Message
+style=wordwrap
+layer=10
+bg=blue
+transparency=0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>180</x><y>80</y><w>70</w><h>60</h></coordinates><panel_attributes>Create New Model
+style=wordwrap
+layer=10
+bg=blue
+transparency=0</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLGeneric</id><coordinates><x>190</x><y>380</y><w>60</w><h>60</h></coordinates><panel_attributes>Update New Model
+style=wordwrap
+layer=10
+bg=blue
+transparency=0</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>240</x><y>360</y><w>280</w><h>50</h></coordinates><panel_attributes>lt=&lt;&lt;-
+r2=201 - Not Auth
+m2=ModelResponse</panel_attributes><additional_attributes>10;20;260;20</additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>540</y><w>210</w><h>120</h></coordinates><panel_attributes>&lt;&lt;ModelSchema&gt;&gt;
+{ Typical Model Schema }
+--
+-_id: ObjectId
+-__v: Number
+-userId: ObjectId
+--
+Responsibilities
+-- Create New Document</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>370</x><y>550</y><w>260</w><h>180</h></coordinates><panel_attributes>_object: Model Document_
+--
+_id: ObjectId="6110ad1b3f45cf8571a54f23"
+__v: Number=0
+userId: ObjectId="6110acaf3f45cf8571a54f22"
+--
+#findById(id: ObjectId): Model
+#find(querry: Object): Model[]
+#save(options: Object): Model
+/+OtherDocumentOperations()/
+--
+Responsibilities
+-- CRUD Ops</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>240</x><y>540</y><w>150</w><h>40</h></coordinates><panel_attributes>lt=&lt;.
+&lt;&lt;instanceOf&gt;&gt;</panel_attributes><additional_attributes>130;20;10;20</additional_attributes></element></diagram>

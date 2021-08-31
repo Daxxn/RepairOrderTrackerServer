@@ -1,11 +1,9 @@
-import bodyParser from 'body-parser';
 import express, { Router, Request, Response, NextFunction } from 'express';
-import mongoose, { FilterQuery } from 'mongoose';
+import mongoose from 'mongoose';
 import MessageHelper from '../utils/messageHelper';
-import { UserModel, UserDoc, createUserModel } from '../models/userModel';
+import { UserModel, createUserModel } from '../models/userModel';
 import {
   createPayPeriodModel,
-  PayPeriodDoc,
   PayPeriodModel,
   PayPeriodObjects,
 } from '../models/payperiodModel';
@@ -15,7 +13,6 @@ import {
   createRepairOrderModel,
   RepairOrderObjects,
 } from '../models/repairOrderModel';
-import { BaseDoc, BaseModel, BaseObject, BaseType } from '../utils/types';
 import DbFunctions from '../utils/dbFunctions';
 import { JobModel, createJobModel, JobObjects } from '../models/jobModel';
 import {
@@ -27,93 +24,6 @@ import {
 const router = express.Router();
 const messages = MessageHelper.get();
 
-// const populateUserData = async (user: UserDoc): Promise<UserDoc> => {
-//   return await user.populate('payPeriods').execPopulate();
-// };
-
-// const getUserPayperiods = async (user: UserDoc, payPeriods: PayPeriodModel): Promise<PayPeriodDoc[]> => {
-//   return await payPeriods.find({
-//     _id: user.payPeriods,
-//   });
-// };
-
-// const buildPayPeriodObjects = (payPeriods: PayPeriodDoc[]): PayPeriodObjects => {
-//   const payPeriodObjects: PayPeriodObjects = {};
-//   if (payPeriods.length > 0) {
-//     Object.values(payPeriods).forEach(pp => {
-//       payPeriodObjects[pp._id] = pp;
-//     });
-//   }
-//   return payPeriodObjects;
-// };
-
-// const buildObjects = (docs: BaseDoc[]): BaseObjects => {
-//   const objects: BaseObjects = {};
-//   if (docs.length > 0) {
-//     Object.values(docs).forEach(doc => {
-//       objects[doc._id] = doc;
-//     });
-//   }
-//   return objects;
-// };
-
-const constructDict = (data: BaseDoc[]): BaseObject => {
-  const output: BaseObject = {};
-  data.forEach(item => {
-    output[item._id] = item;
-  });
-  return output;
-};
-
-type DocContainer = {
-  PayPeriod: PayPeriodModel;
-  RepairOrder: RepairOrderModel;
-  Job: JobModel;
-  Tech: TechModel;
-};
-
-const findAllUserModels = (
-  documents: DocContainer,
-  querry: any
-): Promise<
-  [PayPeriodObjects, RepairOrderObjects, JobObjects, TechObjects]
-> => {
-  return Promise.all([
-    new Promise<PayPeriodObjects>((res, rej) => {
-      documents.PayPeriod.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as PayPeriodObjects);
-      });
-    }),
-    new Promise<RepairOrderObjects>((res, rej) => {
-      documents.RepairOrder.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as RepairOrderObjects);
-      });
-    }),
-    new Promise<JobObjects>((res, rej) => {
-      documents.Job.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as JobObjects);
-      });
-    }),
-    new Promise<TechObjects>((res, rej) => {
-      documents.Tech.find(querry).exec((err, result) => {
-        if (err) {
-          rej(err);
-        }
-        res(constructDict(result) as TechObjects);
-      });
-    }),
-  ]);
-};
-
 const createUserRoute = (
   db: typeof mongoose,
   config: AuthConfig
@@ -123,11 +33,6 @@ const createUserRoute = (
   const RepairOrder: RepairOrderModel = createRepairOrderModel(db);
   const Job: JobModel = createJobModel(db);
   const Tech: TechModel = createTechModel(db);
-
-  // router.options('/', (req, res, next) => {
-  //   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  //   next();
-  // });
 
   router.get(
     '/',
@@ -216,65 +121,209 @@ const createUserRoute = (
     }
   });
 
-  router.post(
-    '/',
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const { email } = req.body;
-        if (email) {
-          let currentUser;
-          let statusCode = 0;
-          const foundUser = await User.findOne({
-            email: email,
-          });
-
-          if (!foundUser) {
-            const newUser = new User({
-              email: email,
-            });
-            await newUser.save();
-            req.session.userId = newUser._id;
-            currentUser = newUser;
-            statusCode = 201;
-          } else {
+  router.get('/auth-id/:authId', async (req, res, next) => {
+    try {
+      const { authId } = req.params;
+      if (authId) {
+        const foundUser = await User.findOne({
+          authId: authId,
+        });
+        if (foundUser) {
+          if (!DbFunctions.checkSession(foundUser._id, req)) {
             req.session.userId = foundUser._id;
-            currentUser = foundUser;
-            statusCode = 200;
           }
-          const querry = {
-            userId: currentUser._id,
-          };
-          // const payPeriods = await PayPeriods.find(querry);
-          // const repairOrders = await RepairOrder.find(querry);
-          // const jobs = await Job.find(querry);
-          // const techs = await Tech.find(querry);
-          const userData = await findAllUserModels(
+          res.status(200).json(foundUser);
+        } else {
+          res.status(200).json({
+            message: messages.noUserFound,
+          });
+        }
+      } else {
+        next(
+          new Error(
+            'Somehow ended up here. should have been routed to a different endpoint.'
+          )
+        );
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // #region OLD User POST
+  // router.post(
+  //   '/',
+  //   async (req: Request, res: Response, next: NextFunction) => {
+  //     try {
+  //       const { email } = req.body;
+  //       if (email) {
+  //         let currentUser;
+  //         let statusCode = 0;
+  //         const foundUser = await User.findOne({
+  //           email: email,
+  //         });
+
+  //         if (!foundUser) {
+  //           const newUser = new User({
+  //             email: email,
+  //           });
+  //           await newUser.save();
+  //           req.session.userId = newUser._id;
+  //           currentUser = newUser;
+  //           statusCode = 201;
+  //         } else {
+  //           req.session.userId = foundUser._id;
+  //           currentUser = foundUser;
+  //           statusCode = 200;
+  //         }
+  //         const querry = {
+  //           userId: currentUser._id,
+  //         };
+  //         const userData = await findAllUserModels(
+  //           {
+  //             PayPeriod,
+  //             RepairOrder,
+  //             Tech,
+  //             Job,
+  //           },
+  //           querry
+  //         );
+
+  //         res.status(statusCode).json({
+  //           user: currentUser,
+  //           payPeriods: userData[0],
+  //           repairOrders: userData[1],
+  //           jobs: userData[2],
+  //           techs: userData[3],
+  //         });
+  //       } else {
+  //         res.status(400).json({
+  //           message: messages.noUserName,
+  //         });
+  //       }
+  //     } catch (err) {
+  //       next(err);
+  //     }
+  //   }
+  // );
+  // #endregion
+
+  router.post('/', async (req, res, next) => {
+    try {
+      const { body } = req;
+      if (body) {
+        const foundUser = await User.find({
+          authId: body.authId,
+        });
+        if (!foundUser) {
+          if (body._id) {
+            delete body._id;
+          }
+          const newUser = new User(body);
+          const savedUser = await newUser.save();
+          res.status(201).json(savedUser);
+        } else {
+          res.status(400).json({
+            message: messages.userExists,
+          });
+        }
+      } else {
+        res.status(400).json({
+          message: messages.noBody,
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/data', async (req, res, next) => {
+    try {
+      if (req.session.userId) {
+        const foundUser = await User.findById(req.session.userId);
+        if (foundUser) {
+          const userData = await DbFunctions.findAllUserModels(
             {
               PayPeriod,
               RepairOrder,
-              Tech,
               Job,
+              Tech,
             },
-            querry
+            DbFunctions.getQuerry(foundUser._id)
           );
-
-          res.status(statusCode).json({
-            user: currentUser,
-            payPeriods: userData[0],
-            repairOrders: userData[1],
-            jobs: userData[2],
-            techs: userData[3],
+          console.log(userData[2]);
+          res.status(200).json({
+            PayPeriods: userData[0],
+            RepairOrders: userData[1],
+            Jobs: userData[2],
+            Techs: userData[3],
           });
         } else {
           res.status(400).json({
-            message: messages.noUserName,
+            message: messages.badSession,
           });
         }
-      } catch (err) {
-        next(err);
+      } else {
+        res.status(400).json({
+          message: messages.badSession,
+        });
       }
+    } catch (err) {
+      next(err);
     }
-  );
+  });
+
+  router.post('/data/:id', async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      if (req.session.userId) {
+        const foundUser = await User.findById(req.session.userId);
+        if (foundUser) {
+          // get all the data...
+        } else {
+          res.status(400).json({
+            message: messages.badSession,
+          });
+        }
+      } else {
+        if (id) {
+          const foundUser = await User.findById(req.session.userId);
+          if (foundUser) {
+            req.session.userId = foundUser._id;
+            const userData = await DbFunctions.findAllUserModels(
+              {
+                PayPeriod,
+                RepairOrder,
+                Job,
+                Tech,
+              },
+              DbFunctions.getQuerry(foundUser._id)
+            );
+            console.log(userData[2]);
+            res.status(200).json({
+              PayPeriods: userData[0],
+              RepairOrders: userData[1],
+              Jobs: userData[2],
+              Techs: userData[3],
+            });
+          } else {
+            res.status(400).json({
+              message: messages.noUserFound,
+            });
+          }
+        } else {
+          res.status(400).json({
+            message: messages.noId,
+          });
+        }
+        res.status(400).json({
+          message: messages.noUserFound,
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
 
   router.patch(
     '/:id',
