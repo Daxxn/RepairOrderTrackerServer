@@ -13,17 +13,17 @@ jobs:
   build:
     environment: build-test-env
     env:
-      PORT: ${{ secret.PORT }}
-      MODE: ${{ secret.MODE }}
-      USE_AUTH: ${{ secret.USE_AUTH }}
-      APP_ORIGIN: ${{ secret.APP_ORIGIN }}
-      LOCAL_APP_ORIGIN: ${{ secret.LOCAL_APP_ORIGIN }}
-      LOCAL_APP_PORT: ${{ secret.LOCAL_APP_PORT }}
-      AUTH0_AUDIENCE: ${{ secret.AUTH0_AUDIENCE }}
-      AUTH0_ISSUER: ${{ secret.AUTH0_ISSUER }}
-      AUTH0_ALGORYTHM: ${{ secret.AUTH0_ALGORYTHM }}
-      DB_CONNECT: ${{ secret.DB_CONNECT }}
-      SESSION_SECRET: ${{ secret.SESSION_SECRET }}
+      PORT: ${{ secrets.PORT }}
+      MODE: ${{ secrets.MODE }}
+      USE_AUTH: ${{ secrets.USE_AUTH }}
+      APP_ORIGIN: ${{ secrets.APP_ORIGIN }}
+      LOCAL_APP_ORIGIN: ${{ secrets.LOCAL_APP_ORIGIN }}
+      LOCAL_APP_PORT: ${{ secrets.LOCAL_APP_PORT }}
+      AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+      AUTH0_ISSUER: ${{ secrets.AUTH0_ISSUER }}
+      AUTH0_ALGORYTHM: ${{ secrets.AUTH0_ALGORYTHM }}
+      DB_CONNECT: ${{ secrets.DB_CONNECT }}
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
     runs-on: ubuntu-latest
 
     strategy:
