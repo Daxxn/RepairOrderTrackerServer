@@ -68,10 +68,7 @@ const localCors: CorsOptions = {
     'Access-Control-Allow-Origin',
     'Authorization',
   ],
-  exposedHeaders: [
-    'Set-Cookie',
-    'Content-Type'
-  ],
+  exposedHeaders: ['Set-Cookie', 'Content-Type'],
   origin: ['http://localhost:3000'],
   credentials: true,
 };
@@ -191,4 +188,6 @@ const startServer = () => {
 };
 
 startServer();
+
+export default app;
 // #endregion
