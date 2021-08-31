@@ -11,7 +11,7 @@
     "test": "mocha ./build/test/testRunner.js",
     "prettier-watch": "onchange \"**/src/*\" -- prettier --write .",
     "build": "ts-node ./src/app.ts",
-    "ci": "npm-run-all pretty test build"
+    "ci": "npm-run-all pretty test ts-compile"
   },
   "author": "",
   "license": "ISC",
