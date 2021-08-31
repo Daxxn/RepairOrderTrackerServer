@@ -38,6 +38,6 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      timeout-minutes: 5
+      - timeout-minutes: 5
       - run: npm install
       - run: npm run ci
