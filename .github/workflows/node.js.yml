@@ -11,19 +11,19 @@ on:
 
 jobs:
   build:
-    environment: build-test-env
+    # environment: build-test-env
     env:
-      PORT: ${{ build-test-env.PORT }}
-      MODE: ${{ build-test-env.MODE }}
-      USE_AUTH: ${{ build-test-env.USE_AUTH }}
-      APP_ORIGIN: ${{ build-test-env.APP_ORIGIN }}
-      LOCAL_APP_ORIGIN: ${{ build-test-env.LOCAL_APP_ORIGIN }}
-      LOCAL_APP_PORT: ${{ build-test-env.LOCAL_APP_PORT }}
-      AUTH0_AUDIENCE: ${{ build-test-env.AUTH0_AUDIENCE }}
-      AUTH0_ISSUER: ${{ build-test-env.AUTH0_ISSUER }}
-      AUTH0_ALGORYTHM: ${{ build-test-env.AUTH0_ALGORYTHM }}
-      DB_CONNECT: ${{ build-test-env.DB_CONNECT }}
-      SESSION_SECRET: ${{ build-test-env.SESSION_SECRET }}
+      PORT: ${{ secret.build-test-env.PORT }}
+      MODE: ${{ secret.build-test-env.MODE }}
+      USE_AUTH: ${{ secret.build-test-env.USE_AUTH }}
+      APP_ORIGIN: ${{ secret.build-test-env.APP_ORIGIN }}
+      LOCAL_APP_ORIGIN: ${{ secret.build-test-env.LOCAL_APP_ORIGIN }}
+      LOCAL_APP_PORT: ${{ secret.build-test-env.LOCAL_APP_PORT }}
+      AUTH0_AUDIENCE: ${{ secret.build-test-env.AUTH0_AUDIENCE }}
+      AUTH0_ISSUER: ${{ secret.build-test-env.AUTH0_ISSUER }}
+      AUTH0_ALGORYTHM: ${{ secret.build-test-env.AUTH0_ALGORYTHM }}
+      DB_CONNECT: ${{ secret.build-test-env.DB_CONNECT }}
+      SESSION_SECRET: ${{ secret.build-test-env.SESSION_SECRET }}
     runs-on: ubuntu-latest
 
     strategy:
