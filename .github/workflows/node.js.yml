@@ -11,6 +11,7 @@ on:
 
 jobs:
   build:
+    environment: build-test-env
     runs-on: ubuntu-latest
 
     strategy:
