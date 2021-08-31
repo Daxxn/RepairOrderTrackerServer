@@ -75,27 +75,7 @@ const createJobRoute = (db: typeof mongoose): Router => {
     }
   });
 
-  //#region POST Gen 1
-  // router.post('/', async (req, res, next) => {
-  //   try {
-  //     const { body } = req;
-  //     if (body) {
-  //       if (body._id) {
-  //         delete body._id;
-  //       }
-  //       const newTech = new Job(body);
-  //       const savedTech = await newTech.save();
-  //       res.status(201).json(savedTech);
-  //     } else {
-  //       res.status(400).json({ message: messages.noBody });
-  //     }
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // });
-  //#endregion
-
-  //#region POST Gen 2
+  // #region New Job Routes
   router.post('/:id', async (req, res, next) => {
     try {
       if (req.session.userId) {
@@ -124,7 +104,7 @@ const createJobRoute = (db: typeof mongoose): Router => {
    * EXPERIMENTAL::Saves many jobs at one time.
    * Body:
    *   [
-   *     {JobModel},
+   *     {JobModel: Object},
    *   ]
    */
   router.post('/many/:id', async (req, res, next) => {
@@ -160,7 +140,7 @@ const createJobRoute = (db: typeof mongoose): Router => {
       next(err);
     }
   });
-  //#endregion
+  // #endregion
 
   router.patch('/:id', async (req, res, next) => {
     try {

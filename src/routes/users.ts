@@ -150,64 +150,7 @@ const createUserRoute = (
     }
   });
 
-  // #region OLD User POST
-  // router.post(
-  //   '/',
-  //   async (req: Request, res: Response, next: NextFunction) => {
-  //     try {
-  //       const { email } = req.body;
-  //       if (email) {
-  //         let currentUser;
-  //         let statusCode = 0;
-  //         const foundUser = await User.findOne({
-  //           email: email,
-  //         });
-
-  //         if (!foundUser) {
-  //           const newUser = new User({
-  //             email: email,
-  //           });
-  //           await newUser.save();
-  //           req.session.userId = newUser._id;
-  //           currentUser = newUser;
-  //           statusCode = 201;
-  //         } else {
-  //           req.session.userId = foundUser._id;
-  //           currentUser = foundUser;
-  //           statusCode = 200;
-  //         }
-  //         const querry = {
-  //           userId: currentUser._id,
-  //         };
-  //         const userData = await findAllUserModels(
-  //           {
-  //             PayPeriod,
-  //             RepairOrder,
-  //             Tech,
-  //             Job,
-  //           },
-  //           querry
-  //         );
-
-  //         res.status(statusCode).json({
-  //           user: currentUser,
-  //           payPeriods: userData[0],
-  //           repairOrders: userData[1],
-  //           jobs: userData[2],
-  //           techs: userData[3],
-  //         });
-  //       } else {
-  //         res.status(400).json({
-  //           message: messages.noUserName,
-  //         });
-  //       }
-  //     } catch (err) {
-  //       next(err);
-  //     }
-  //   }
-  // );
-  // #endregion
-
+  // #region UserData Routes
   router.post('/', async (req, res, next) => {
     try {
       const { body } = req;
@@ -322,6 +265,7 @@ const createUserRoute = (
       next(err);
     }
   });
+  // #endregion
 
   router.patch(
     '/:id',

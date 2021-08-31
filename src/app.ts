@@ -11,7 +11,6 @@ import session, {
 } from 'express-session';
 import mongoose from 'mongoose';
 import createApiRouter from './routes/api';
-import createAuthRoute from './routes/auth';
 import AuthConfigHelper from './utils/authCheck';
 import MongoStore from 'connect-mongo';
 import { ConnectMongoOptions } from 'connect-mongo/build/main/lib/MongoStore';
@@ -56,7 +55,6 @@ const buildLogoutRoute = () => {
 
 const buildRoutes = (db: typeof mongoose) => {
   app.use('/api', createApiRouter(db, config));
-  app.use('/auth', createAuthRoute(db));
   buildLogoutRoute();
 };
 //#endregion

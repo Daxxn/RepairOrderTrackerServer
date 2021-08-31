@@ -19,6 +19,7 @@ const createTechRoute = (db: typeof mongoose): Router => {
     }
   });
 
+  // #region New Tech Routes
   router.post('/', async (req, res, next) => {
     try {
       const { body } = req;
@@ -33,7 +34,9 @@ const createTechRoute = (db: typeof mongoose): Router => {
       next(err);
     }
   });
+  // #endregion
 
+  // #region Update Tech Routes
   router.patch('/:id', async (req, res, next) => {
     try {
       res.status(420).json({ message: messages.notImplemented });
@@ -41,7 +44,9 @@ const createTechRoute = (db: typeof mongoose): Router => {
       next(err);
     }
   });
+  // #endregion
 
+  // #region Delete Tech Routes
   router.delete('/:id', async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -61,6 +66,7 @@ const createTechRoute = (db: typeof mongoose): Router => {
       next(err);
     }
   });
+  // #endregion
 
   return router;
 };

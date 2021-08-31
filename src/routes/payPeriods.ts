@@ -69,24 +69,7 @@ const createPayPeriodRoute = (db: typeof mongoose): Router => {
     }
   });
 
-  //#region POST Gen 1
-  // router.post('/', async (req, res, next) => {
-  //   try {
-  //     const { body } = req;
-  //     if (body) {
-  //       const newPayPeriod = new PayPeriod(body);
-  //       await newPayPeriod.save();
-  //       res.status(201).json(newPayPeriod);
-  //     } else {
-  //       res.status(400).json({ message: messages.noBody });
-  //     }
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // });
-  //#endregion
-
-  //#region POST Gen 2
+  //#region New PayPeriod Routes
   router.post('/', async (req, res, next) => {
     try {
       if (req.session.userId) {
