@@ -11,7 +11,9 @@ on:
 
 jobs:
   build:
-    environment: build-test-env
+    environment: 
+      name: build-test-env
+      url: https://github.com/Daxxn/RepairOrderTrackerServer/
     runs-on: ubuntu-latest
 
     strategy:
