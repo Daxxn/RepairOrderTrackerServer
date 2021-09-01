@@ -70,10 +70,19 @@ const createRepairOrderRoute = (db: typeof mongoose): Router => {
             userId,
           });
           const payPeriod = await PayPeriod.findById(parentId);
-          const savedRO = await newRO.save();
-          payPeriod.repairOrders.push(savedRO._id);
-          await payPeriod.save();
-          res.status(201).json(savedRO);
+          if (payPeriod) {
+            const savedRO = await newRO.save();
+            payPeriod.repairOrders.push(savedRO._id);
+            await payPeriod.save();
+            res.status(201).json({
+              parent: payPeriod,
+              model: savedRO,
+            });
+          } else {
+            res
+              .status(400)
+              .json({ message: messages.modelNotFound('Pay Period') });
+          }
         } else {
           res.status(400).json({ message: messages.badSession });
         }

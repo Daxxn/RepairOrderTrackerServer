@@ -84,8 +84,8 @@ style=wordwrap
 layer=10
 bg=blue
 transparency=0</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>240</x><y>360</y><w>280</w><h>50</h></coordinates><panel_attributes>lt=&lt;&lt;-
-r2=201 - Not Auth
-m2=ModelResponse</panel_attributes><additional_attributes>10;20;260;20</additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>540</y><w>210</w><h>120</h></coordinates><panel_attributes>&lt;&lt;ModelSchema&gt;&gt;
+r2=201 - Model Response
+m2=NewModelResponse</panel_attributes><additional_attributes>10;20;260;20</additional_attributes></element><element><id>UMLClass</id><coordinates><x>40</x><y>540</y><w>210</w><h>120</h></coordinates><panel_attributes>&lt;&lt;ModelSchema&gt;&gt;
 { Typical Model Schema }
 --
 -_id: ObjectId
