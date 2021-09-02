@@ -67,7 +67,6 @@ export default class AuthConfigHelper {
   private static normalizeEnvOption(): EnvOption {
     if (process.env.MODE) {
       const tempEnv = process.env.MODE as EnvOption;
-      console.log(tempEnv);
       if (tempEnv) {
         return tempEnv;
       }

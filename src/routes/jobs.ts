@@ -76,17 +76,18 @@ const createJobRoute = (db: typeof mongoose): Router => {
   });
 
   // #region New Job Routes
-  router.post('/:id', async (req, res, next) => {
+  router.post('/:parentId', async (req, res, next) => {
     try {
       if (req.session.userId) {
         const { userId } = req.session;
-        const { id } = req.params;
-        const ro = await RepairOrder.findById(id);
+        const { parentId } = req.params;
+        const ro = await RepairOrder.findById(parentId);
+        if (ro) {
+        } else {
+          res.status(400).json({ message: messages.parentNotFound(ro) });
+        }
         const newJob = new Job({
           userId,
-          name: 'Test',
-          description: 'remove at a later time.',
-          time: 100,
         });
         const savedJob = await newJob.save();
         ro.jobs.push(savedJob._id);
@@ -126,7 +127,7 @@ const createJobRoute = (db: typeof mongoose): Router => {
             } else {
               res
                 .status(400)
-                .json({ message: messages.modelNotFound('Repair Order') });
+                .json({ message: messages.modelNotFound(parentRO) });
             }
           } else {
             res.status(400).json({ message: messages.tooManyModels });
@@ -144,7 +145,26 @@ const createJobRoute = (db: typeof mongoose): Router => {
 
   router.patch('/:id', async (req, res, next) => {
     try {
-      res.status(420).json({ message: messages.notImplemented });
+      const { id } = req.params;
+      const { body } = req;
+      if (id) {
+        if (body) {
+          const foundJob = await Job.findById(id);
+          if (foundJob) {
+            Object.assign(foundJob, body);
+            const updatedJob = await foundJob.save();
+            res.status(200).json(updatedJob);
+          } else {
+            res.status(400).json({
+              message: messages.modelNotFound(foundJob),
+            });
+          }
+        } else {
+          res.status(400).json({ message: messages.noBody });
+        }
+      } else {
+        res.status(400).json({ message: messages.noId });
+      }
     } catch (err) {
       next(err);
     }

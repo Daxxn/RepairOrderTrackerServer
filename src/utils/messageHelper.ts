@@ -12,6 +12,7 @@ export default interface MessageHelper {
   badSession: string;
   tooManyModels: string;
   modelNotFound: <T>(model: T) => string;
+  parentNotFound: <T>(model: T) => string;
 }
 
 export default class MessageHelper {
@@ -32,6 +33,9 @@ export default class MessageHelper {
       'Too many models to save at one time. Split the models into multiple requests.',
     modelNotFound: <T>(model: T) => {
       return `Model not found in database: ${typeof model}`;
+    },
+    parentNotFound: <T>(model: T) => {
+      return `Parent Model not found in database: ${typeof model}`;
     },
   };
 

@@ -75,8 +75,6 @@ app.options('/', (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
 });
 
-console.log(localCors);
-
 const prodCors: CorsOptions = {
   origin: config.appOrigin,
   preflightContinue: true,

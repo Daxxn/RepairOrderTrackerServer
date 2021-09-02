@@ -94,7 +94,6 @@ export default class DbFunctions {
     data.forEach(item => {
       output[item._id] = item;
     });
-    console.log(output);
     return output;
   };
 
