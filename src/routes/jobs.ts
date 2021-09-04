@@ -105,6 +105,33 @@ const createJobRoute = (db: typeof mongoose): Router => {
     }
   });
 
+  router.post('/complete/', async (req, res, next) => {
+    try {
+      const { userId } = req.session;
+      const { body } = req;
+      if (userId) {
+        if (body) {
+          const newJob = new Job({
+            name: body.name,
+            description: body.description,
+            assignedTech: body.assignedTech,
+            time: body.time,
+            isRecall: body.isRecall,
+            userId: userId,
+          });
+          const savedJob = await newJob.save();
+          res.status(201).json({
+            model: savedJob,
+          });
+        } else {
+        }
+      } else {
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
   /**
    * EXPERIMENTAL::Saves many jobs at one time.
    * Body:
