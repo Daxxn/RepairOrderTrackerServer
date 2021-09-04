@@ -81,18 +81,22 @@ const createJobRoute = (db: typeof mongoose): Router => {
       if (req.session.userId) {
         const { userId } = req.session;
         const { parentId } = req.params;
-        const ro = await RepairOrder.findById(parentId);
-        if (ro) {
+        const { body } = req;
+        if (body) {
+          const ro = await RepairOrder.findById(parentId);
+          const newJob = new Job({
+            userId,
+            name: body.name,
+          });
+          const savedJob = await newJob.save();
+          if (ro) {
+            ro.jobs.push(savedJob._id);
+            await ro.save();
+          }
+          res.status(201).json(savedJob);
         } else {
-          res.status(400).json({ message: messages.parentNotFound(ro) });
+          res.status(400).json({ message: messages.noBody });
         }
-        const newJob = new Job({
-          userId,
-        });
-        const savedJob = await newJob.save();
-        ro.jobs.push(savedJob._id);
-        await ro.save();
-        res.status(201).json(savedJob);
       } else {
         res.status(400).json({ message: messages.badSession });
       }
