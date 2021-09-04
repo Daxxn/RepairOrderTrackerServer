@@ -81,20 +81,51 @@ const createJobRoute = (db: typeof mongoose): Router => {
       if (req.session.userId) {
         const { userId } = req.session;
         const { parentId } = req.params;
-        const ro = await RepairOrder.findById(parentId);
-        if (ro) {
+        const { body } = req;
+        if (body) {
+          const ro = await RepairOrder.findById(parentId);
+          const newJob = new Job({
+            userId,
+            name: body.name,
+          });
+          const savedJob = await newJob.save();
+          if (ro) {
+            ro.jobs.push(savedJob._id);
+            await ro.save();
+          }
+          res.status(201).json(savedJob);
         } else {
-          res.status(400).json({ message: messages.parentNotFound(ro) });
+          res.status(400).json({ message: messages.noBody });
         }
-        const newJob = new Job({
-          userId,
-        });
-        const savedJob = await newJob.save();
-        ro.jobs.push(savedJob._id);
-        await ro.save();
-        res.status(201).json(savedJob);
       } else {
         res.status(400).json({ message: messages.badSession });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.post('/complete/', async (req, res, next) => {
+    try {
+      const { userId } = req.session;
+      const { body } = req;
+      if (userId) {
+        if (body) {
+          const newJob = new Job({
+            name: body.name,
+            description: body.description,
+            assignedTech: body.assignedTech,
+            time: body.time,
+            isRecall: body.isRecall,
+            userId: userId,
+          });
+          const savedJob = await newJob.save();
+          res.status(201).json({
+            model: savedJob,
+          });
+        } else {
+        }
+      } else {
       }
     } catch (err) {
       next(err);

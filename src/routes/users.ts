@@ -308,7 +308,25 @@ const createUserRoute = (
         if (id) {
           const foundUser = await User.findById(id);
           if (foundUser) {
-            await foundUser.remove();
+            await Promise.all([
+              foundUser.remove(),
+              PayPeriod.find(
+                { userId: foundUser._id },
+                { $pull: { userId: foundUser._id } }
+              ),
+              RepairOrder.find(
+                { userId: foundUser._id },
+                { $pull: { userId: foundUser._id } }
+              ),
+              Job.find(
+                { userId: foundUser._id },
+                { $pull: { userId: foundUser._id } }
+              ),
+              Tech.find(
+                { userId: foundUser._id },
+                { $pull: { userId: foundUser._id } }
+              ),
+            ]);
             res.status(200).json({
               message: messages.userDeleted,
             });
